@@ -1,62 +1,208 @@
-﻿<!doctype html>
-<html lang="zh-CN"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#060d20">
-<meta name="description" content="庄剑辉的个人作品集：独立获奖项目、多 AI 协作方法、第一作者在投论文与竞赛实践。"><title>庄剑辉 · 让想法成为作品</title>
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="preload" href="assets/fonts/manrope.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="experience.css?v=7">
-<script>document.documentElement.classList.add('has-js');</script><script defer src="assets/vendor/gsap.min.js"></script><script defer src="particles.js?v=7"></script><script defer src="experience.js?v=7"></script>
-</head><body>
-<canvas id="particle-field" aria-hidden="true"></canvas><div class="ambient-light" aria-hidden="true"></div><div class="transition-beam" aria-hidden="true"><i></i></div>
-<div class="opening"><div class="opening-shutter shutter-top"></div><div class="opening-shutter shutter-bottom"></div><div class="opening-word">Jianhui<span>让想法成为作品</span></div><span class="opening-line"></span><button id="skip-opening">跳过开场</button></div>
-<a class="skip-link" href="#projects">直接查看作品</a>
-<header class="site-header"><a href="#story" class="brand" aria-label="庄剑辉，首页">Jianhui<span>庄剑辉</span></a><nav aria-label="主导航"><a href="#ai-method">协作方法</a><a href="#projects">作品</a><a href="#research">研究</a><a href="#honors">获奖</a></nav><a class="header-contact" href="#contact">联系我 <span>↗</span></a></header>
-<main class="scene-deck" aria-label="庄剑辉的七个作品集场景">
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f1ede4">
+<meta name="description" content="庄剑辉的个人作品集：独立获奖项目、多 AI 协作方法、第一作者在投论文与竞赛实践。">
+<title>庄剑辉 · 让想法成为作品</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/manrope.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="site.css?v=8">
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i></i></div>
+<div class="cursor" aria-hidden="true"><i class="dot"></i><i class="ring"></i></div>
+<a class="skip" href="#work">跳到作品</a>
+<nav class="rail" aria-label="章节索引"></nav>
 
-<section class="scene scene-hero is-active" id="story" data-name="认识我" data-tone="dark" aria-labelledby="hero-title">
- <div class="scene-content hero-layout"><div class="hero-copy">
-  <p class="identity reveal-item"><span class="status-light"></span> 庄剑辉 <span class="identity-divider"></span> AI 应用开发</p>
-  <h1 id="hero-title" class="reveal-item">让想法，<br>成为作品。</h1><p class="lead reveal-item">多 AI 协作，由我定义目标、组织分工。<br>用审核与测试，把想法推进到真实成果。</p>
-  <div class="actions reveal-item"><a class="button primary" href="#projects">进入我的作品 <span>↗</span></a><a class="button text-button" href="#ai-method">我的协作方法 <span>+</span></a></div><p class="hero-education reveal-item">深圳信息职业技术大学 · 2025 级 · 2028 年毕业</p>
- </div><div class="hero-visual scene-art" aria-hidden="true"><span class="orbit-label orbit-label-a">想法</span><span class="orbit-label orbit-label-b">协作</span><span class="orbit-label orbit-label-c">作品</span><div class="orbit-caption"><span class="spark"></span> 思考，连接，创造。</div></div>
- <div class="hero-proof reveal-item"><button data-go="2"><strong>2 项独立作品</strong><span>国赛三等奖 / 华南一等奖</span><i>↗</i></button><button data-proof="mati-national-silver"><strong>国赛银奖</strong><span>码蹄杯 · 个人算法竞赛</span><i>↗</i></button><button data-go="4"><strong>第一作者</strong><span>期刊论文投稿中</span><i>↗</i></button></div></div>
-</section>
+<header class="nav">
+  <a class="brand" href="#hero"><b>庄剑辉</b><span>Jianhui</span></a>
+  <nav class="nav-links" aria-label="主导航">
+    <a href="#method">协作方法</a>
+    <a href="#work">作品</a>
+    <a href="#research">研究</a>
+    <a href="#honors">荣誉</a>
+  </nav>
+  <a class="nav-mail" href="mailto:3282016034@qq.com">3282016034@qq.com</a>
+</header>
 
-<section class="scene scene-method" id="ai-method" data-name="多 AI 协作" data-tone="dark" aria-labelledby="method-title" inert aria-hidden="true">
- <div class="scene-content method-layout"><div class="section-copy"><p class="eyebrow reveal-item">我的工作方法</p><h2 id="method-title" class="reveal-item">AI 协作。<br>我来掌舵。</h2><p class="lead reveal-item">工具可以很多，判断必须清楚。<br>从需求到验证，我有自己的推进流程。</p><div class="tool-list reveal-item" aria-label="熟练使用的 AI 工具"><span>ChatGPT</span><span>DeepSeek Harness</span><span>WorkBuddy</span><span>Qoder</span><span>TRAE</span></div><button class="button text-button reveal-item" data-detail="method">查看完整协作方法 <span>+</span></button></div>
- <div class="method-stage scene-art"><div class="method-orbit" aria-hidden="true"><svg viewBox="0 0 560 400"><defs><linearGradient id="flow-gradient"><stop stop-color="#477dff"/><stop offset="1" stop-color="#a8eeff"/></linearGradient></defs><path class="orbit-track" d="M60 205 C60 12 500 12 500 205 S60 398 60 205Z"/><path class="orbit-track orbit-track-inner" d="M155 205 C155 75 405 75 405 205 S155 335 155 205Z"/><path class="flow-route" d="M65 205 H210 M350 205 H495 M280 58 V155 M280 255 V350"/></svg><span class="orbit-dot dot-a"></span><span class="orbit-dot dot-b"></span><span class="orbit-dot dot-c"></span></div><div class="human-core"><span>决策与推进</span><strong>我</strong><span>协调 · 审核 · 交付</span></div>
- <div class="method-selectors" role="tablist" aria-label="AI 协作方法"><button role="tab" id="method-tab-0" aria-selected="true" aria-controls="method-panel" data-method="0"><span>01</span>需求拆解</button><button role="tab" id="method-tab-1" aria-selected="false" tabindex="-1" aria-controls="method-panel" data-method="1"><span>02</span>多 AI 分工</button><button role="tab" id="method-tab-2" aria-selected="false" tabindex="-1" aria-controls="method-panel" data-method="2"><span>03</span>结果审核</button><button role="tab" id="method-tab-3" aria-selected="false" tabindex="-1" aria-controls="method-panel" data-method="3"><span>04</span>测试迭代</button></div>
- <div id="method-panel" class="method-panel" role="tabpanel" aria-labelledby="method-tab-0"><span class="panel-marker">01 / 定义问题</span><h3>先明确要解决什么。</h3><p>把需求拆成可执行任务，给出目标、边界和验收方式，再交给 AI 辅助实现。</p></div></div></div>
-</section>
+<main>
+  <section class="hero" id="hero">
+    <p class="kicker rv"><span>01</span>认识我</p>
+    <div class="hero-cols">
+      <h1 class="display">让想法<br>成为作品。</h1>
+      <div class="hero-side">
+        <p class="lede rv">多 AI 协作，由我定义目标、组织分工。用审核与测试，把想法推进到真实成果。</p>
+        <dl class="facts rv">
+          <div><dt>学校</dt><dd>深圳信息职业技术大学</dd></div>
+          <div><dt>方向</dt><dd>AI 应用开发 · 多 AI 协作</dd></div>
+          <div><dt>届别</dt><dd>2025 级 · 2028 年毕业</dd></div>
+        </dl>
+      </div>
+    </div>
+    <ul class="proof rv">
+      <li><span>02</span><b>独立作品</b><em>国赛三等奖 / 华南一等奖</em></li>
+      <li><span>01</span><b>国赛银奖</b><em>码蹄杯 · 个人算法赛</em></li>
+      <li><span>01</span><b>第一作者</b><em>期刊论文投稿中</em></li>
+    </ul>
+  </section>
 
-<section class="scene scene-career" id="projects" data-name="职业规划智能体" data-tone="light" aria-labelledby="career-title" inert aria-hidden="true">
- <div class="scene-content project-layout"><div class="section-copy"><p class="eyebrow reveal-item">独立开发 · 2026.04</p><h2 id="career-title" class="reveal-item">职业规划<br>智能体。</h2><p class="lead reveal-item">把企业命题，做成可运行的网站。<br>连接岗位探索、成长路径与 AI 简历解析。</p><div class="award-inline reveal-item"><span>服务外包创新创业大赛</span><strong>全国赛三等奖</strong><small>初赛小组第一名</small></div><div class="actions reveal-item"><button class="button primary" data-detail="career">如何构建这个项目 <span>+</span></button><button class="button text-button" data-proof="outsourcing-national-third">获奖证明 <span>↗</span></button></div></div>
- <div class="career-stage scene-art" data-tilt><span class="stage-annotation top-annotation">从企业需求，到完整功能</span><button class="browser-sculpture" data-detail="career" aria-label="查看职业规划智能体构建过程"><span class="browser-top"><i></i><i></i><i></i><span>职业规划智能体 · 界面节选</span></span><picture><source type="image/webp" srcset="assets/images/career-live.webp"><picture><source type="image/webp" srcset="assets/images/career-live.webp"><img src="assets/images/career-live.jpg" alt="职业规划智能体实际网站界面" width="1440" height="1000"></picture></picture><span class="browser-bottom">需求拆解 <i>→</i> AI 辅助构建 <i>→</i> 审核验证</span></button><div class="feature-float feature-a"><span class="tiny-icon">↗</span><div><strong>岗位探索</strong><span>发现职业方向</span></div></div><div class="feature-float feature-b"><span class="tiny-icon">◎</span><div><strong>AI 简历解析</strong><span>连接个人与岗位</span></div></div><span class="stage-annotation bottom-annotation">点击界面，了解我的构建过程</span></div></div>
-</section>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>独立作品 ✳ 多 AI 协作 ✳ 第一作者 ✳ 国赛银奖 ✳ 视障出行原型 ✳ 生态安全研究 ✳ 码蹄杯 ✳ 服务外包 ✳ </span>
+      <span>独立作品 ✳ 多 AI 协作 ✳ 第一作者 ✳ 国赛银奖 ✳ 视障出行原型 ✳ 生态安全研究 ✳ 码蹄杯 ✳ 服务外包 ✳ </span>
+    </div>
+  </div>
 
-<section class="scene scene-soundlane" id="soundlane-case" data-name="SoundLane" data-tone="dark" aria-labelledby="soundlane-title" inert aria-hidden="true">
- <div class="scene-content project-layout soundlane-layout"><div class="section-copy"><p class="eyebrow reveal-item">独立完成 · 2026.08</p><h2 id="soundlane-title" class="reveal-item">SoundLane<span class="title-dot">.</span></h2><p class="project-tagline reveal-item">让交互，听得见。</p><p class="lead reveal-item">面向视障出行，探索视觉识别、<br>语音反馈与守护人协同的交互原型。</p><div class="award-inline reveal-item"><span>中国高校计算机大赛 · 移动应用创新赛</span><strong>华南赛区一等奖</strong><small>启明赛道（高教组）</small></div><div class="actions reveal-item"><button class="button primary" data-detail="soundlane">从场景到作品 <span>+</span></button><button class="button text-button" data-proof="soundlane-mobile-first">获奖证明 <span>↗</span></button></div><p class="stage-note reveal-item">可运行的交互原型 · 尚未投入实际出行使用</p></div>
- <div class="soundlane-stage scene-art" data-tilt><div class="sound-halo" aria-hidden="true"></div><div class="phone-array"><button class="phone-shot phone-left" data-phone="2" aria-label="查看守护人界面"><picture><source type="image/webp" srcset="assets/images/soundlane-guard.webp"><img src="assets/images/soundlane-guard.jpg" alt="SoundLane 守护人界面" width="832" height="1800"></picture></button><button class="phone-shot phone-center" data-detail="soundlane" aria-label="查看 SoundLane 项目详情"><span class="phone-notch"></span><img id="phone-main-image" src="assets/images/soundlane-home.jpg" alt="SoundLane 首页" width="832" height="1800"></button><button class="phone-shot phone-right" data-phone="1" aria-label="查看导航界面"><picture><source type="image/webp" srcset="assets/images/soundlane-navigation.webp"><img src="assets/images/soundlane-navigation.jpg" alt="SoundLane 导航界面" width="832" height="1800"></picture></button></div><div class="phone-switch" role="group" aria-label="切换作品界面"><button data-phone="0" aria-pressed="true">首页</button><button data-phone="1" aria-pressed="false">导航</button><button data-phone="2" aria-pressed="false">守护人</button></div><div class="audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
-</section>
+  <section class="sec sec--ink" id="method">
+    <header class="sec-head">
+      <p class="kicker rv"><span>02</span>我的工作方法</p>
+      <h2 class="display sm">AI 协作。<br>我来掌舵。</h2>
+      <p class="lede rv">工具可以很多，判断必须清楚。从需求到验证，我有自己的推进流程。</p>
+    </header>
+    <ol class="steps" id="method-steps"></ol>
+    <div class="sec-foot rv">
+      <ul class="chips" aria-label="熟练使用的 AI 工具">
+        <li>ChatGPT</li><li>DeepSeek Harness</li><li>WorkBuddy</li><li>Qoder</li><li>TRAE</li>
+      </ul>
+      <button class="link-btn" data-detail="method">完整协作方法 <i>↗</i></button>
+    </div>
+  </section>
 
-<section class="scene scene-research" id="research" data-name="研究与验证" data-tone="dark" aria-labelledby="research-title" inert aria-hidden="true">
- <div class="scene-content research-layout"><div class="section-copy"><p class="eyebrow reveal-item">第一作者 · 期刊投稿中</p><h2 id="research-title" class="reveal-item">让好奇心，<br>经过验证。</h2><p class="lead reveal-item">观察频率如何影响生态安全评价与预测？<br>我驱动 3 个 AI 分工协作，推进研究全流程。</p><div class="research-facts reveal-item"><div><strong>2005–2023</strong><span>祁连山历史观测数据</span></div><div><strong>3 类模型</strong><span>比较 · 滚动验证 · 敏感性分析</span></div></div><p class="journal reveal-item">投稿至 Journal of Mountain Science</p><button class="button primary reveal-item" data-detail="research">完整研究与协作过程 <span>+</span></button></div>
- <div class="research-stage scene-art"><div class="research-scan" aria-hidden="true"><svg viewBox="0 0 600 200"><path class="terrain back" d="M0 170 45 140 75 150 110 80 145 100 195 30 225 85 270 48 320 130 365 65 400 90 440 10 485 92 530 60 570 150 600 130"/><path class="terrain front" d="M0 190 45 170 95 140 140 155 180 110 215 135 260 75 305 118 345 90 390 145 430 110 480 160 535 115 600 180"/><path class="scan-line" d="M0 192 H600"/></svg><span>研究问题 → 数据 → 验证 → 投稿</span><i class="scan-sweep"></i></div><div class="research-tabs" role="tablist" aria-label="研究流程"><button id="research-tab-0" role="tab" aria-selected="true" aria-controls="research-panel" data-research="0">选题</button><button id="research-tab-1" role="tab" tabindex="-1" aria-selected="false" aria-controls="research-panel" data-research="1">数据</button><button id="research-tab-2" role="tab" tabindex="-1" aria-selected="false" aria-controls="research-panel" data-research="2">验证</button><button id="research-tab-3" role="tab" tabindex="-1" aria-selected="false" aria-controls="research-panel" data-research="3">协作</button><button id="research-tab-4" role="tab" tabindex="-1" aria-selected="false" aria-controls="research-panel" data-research="4">投稿</button></div><div class="research-panel" id="research-panel" role="tabpanel" aria-labelledby="research-tab-0"><span class="panel-marker">01 / 研究问题</span><h3>从一个值得验证的问题开始。</h3><p>围绕祁连山生态安全评价，考察观测频率对评价与预测可靠性的影响，确定研究问题与分析路径。</p><div class="research-tags"><span>生态安全</span><span>观测频率</span><span>预测可靠性</span></div></div></div></div>
-</section>
+  <section class="work" id="work">
+    <article class="project" id="projects">
+      <div class="project-copy">
+        <p class="kicker rv"><span>03</span>作品一 · 独立开发 · 2026.04</p>
+        <h2 class="display sm rv">职业规划<br>智能体。</h2>
+        <p class="lede rv">把企业命题，做成可运行的网站。连接岗位探索、成长路径与 AI 简历解析。</p>
+        <div class="award rv">
+          <p>服务外包创新创业大赛</p>
+          <b>全国赛三等奖</b>
+          <em>初赛小组第一名</em>
+        </div>
+        <div class="cta rv">
+          <button class="btn" data-detail="career">构建过程 <i>↗</i></button>
+          <button class="link-btn" data-proof="outsourcing-national-third">获奖证明 <i>↗</i></button>
+        </div>
+      </div>
+      <figure class="project-media rv">
+        <div class="browser">
+          <div class="browser-bar"><i></i><i></i><i></i><span>职业规划智能体 · 界面节选</span></div>
+          <picture><source type="image/webp" srcset="assets/images/career-live.webp"><img src="assets/images/career-live.jpg" alt="职业规划智能体实际网站界面" width="1440" height="1000" loading="lazy"></picture>
+        </div>
+        <figcaption>从企业需求，到完整功能</figcaption>
+      </figure>
+    </article>
 
-<section class="scene scene-honors" id="honors" data-name="竞赛与成长" data-tone="light" aria-labelledby="honors-title" inert aria-hidden="true">
- <div class="scene-content honors-layout"><div class="section-copy"><p class="eyebrow reveal-item">竞赛与成长</p><h2 id="honors-title" class="reveal-item">每一份成绩，<br>都有来路。</h2><div class="honor-narrative reveal-item" aria-live="polite"><p id="honor-event">第八届码蹄杯全国大学生程序设计大赛</p><h3 id="honor-result">国赛银奖 / 省赛金奖</h3><p id="honor-task">个人赛，限定时间内完成算法题，通过在线评测检验代码。</p><p class="honor-practice" id="honor-practice">使用 Python 拆解问题、编程与调试，依据评测反馈检查边界条件。</p></div><div class="honor-controls reveal-item"><button class="circle-button" id="honor-prev" aria-label="上一个比赛">←</button><div class="honor-dots" role="group" aria-label="选择比赛"><button data-honor="0" aria-label="码蹄杯" aria-pressed="true"></button><button data-honor="1" aria-label="服务外包" aria-pressed="false"></button><button data-honor="2" aria-label="移动应用" aria-pressed="false"></button><button data-honor="3" aria-label="机器人视觉" aria-pressed="false"></button></div><button class="circle-button" id="honor-next" aria-label="下一个比赛">→</button><span id="honor-count">01 / 04</span></div><button class="button text-button reveal-item" data-detail="honors">全部获奖与实践 <span>+</span></button></div><div class="honor-stage scene-art" data-tilt><div class="certificate-plinth" aria-hidden="true"></div><div class="certificate-back back-one" aria-hidden="true"></div><div class="certificate-back back-two" aria-hidden="true"></div><button class="featured-certificate" id="honor-proof" data-proof="mati-national-silver" aria-label="放大获奖证书"><img id="honor-image" src="assets/certificates/mati-national-silver.jpg" alt="码蹄杯国赛银奖证书" width="904" height="1280"><span>查看证书原图 <i>↗</i></span></button><span class="honor-stage-note">任务 · 实践 · 成果</span></div></div>
-</section>
+    <article class="project project--flip project--ink" id="soundlane-case">
+      <div class="project-copy">
+        <p class="kicker rv"><span>04</span>作品二 · 独立完成 · 2026.08</p>
+        <h2 class="display sm rv">SoundLane<span class="dot">.</span></h2>
+        <p class="tagline rv">让交互，听得见。</p>
+        <p class="lede rv">面向视障出行，探索视觉识别、语音反馈与守护人协同的交互原型。</p>
+        <div class="award rv">
+          <p>中国高校计算机大赛 · 移动应用创新赛</p>
+          <b>华南赛区一等奖</b>
+          <em>启明赛道（高教组）</em>
+        </div>
+        <div class="phone-switch rv" role="group" aria-label="切换作品界面">
+          <button data-phone="0" aria-pressed="true">首页</button>
+          <button data-phone="1" aria-pressed="false">导航</button>
+          <button data-phone="2" aria-pressed="false">守护人</button>
+        </div>
+        <div class="cta rv">
+          <button class="btn" data-detail="soundlane">从场景到作品 <i>↗</i></button>
+          <button class="link-btn" data-proof="soundlane-mobile-first">获奖证明 <i>↗</i></button>
+        </div>
+        <p class="note rv">可运行的交互原型 · 尚未投入实际出行使用</p>
+      </div>
+      <figure class="project-media phones rv">
+        <button class="phone" data-phone="2" aria-label="查看守护人界面">
+          <picture><source type="image/webp" srcset="assets/images/soundlane-guard.webp"><img src="assets/images/soundlane-guard.jpg" alt="SoundLane 守护人界面" width="832" height="1800" loading="lazy"></picture>
+        </button>
+        <button class="phone main" data-detail="soundlane" aria-label="查看 SoundLane 项目详情">
+          <img id="phone-main-image" src="assets/images/soundlane-home.jpg" alt="SoundLane 首页" width="832" height="1800" loading="lazy">
+        </button>
+        <button class="phone" data-phone="1" aria-label="查看导航界面">
+          <picture><source type="image/webp" srcset="assets/images/soundlane-navigation.webp"><img src="assets/images/soundlane-navigation.jpg" alt="SoundLane 导航界面" width="832" height="1800" loading="lazy"></picture>
+        </button>
+      </figure>
+    </article>
+  </section>
 
-<section class="scene scene-contact" id="contact" data-name="关于我与联系" data-tone="dark" aria-labelledby="contact-title" inert aria-hidden="true">
- <div class="scene-content contact-layout"><div class="section-copy"><p class="eyebrow reveal-item">下一件作品，正在路上。</p><h2 id="contact-title" class="reveal-item">保持好奇。<br>继续创造。</h2><p class="lead reveal-item">我是庄剑辉，专注 AI 应用开发与多 AI 协作。<br>期待把下一次合作，做成新的成果。</p><div class="contact-education reveal-item"><strong>深圳信息职业技术大学</strong><span>软件技术 · 工业软件应用开发方向</span><span>大专在读 · 2025.09—2028.08（预计）</span></div><div class="contact-actions reveal-item"><a href="mailto:3282016034@qq.com" class="email-link">3282016034@qq.com <span>↗</span></a><button class="copy-email" aria-label="复制邮箱">复制邮箱</button></div><p class="contact-location reveal-item">广东 · 深圳 <span>© 2026 庄剑辉</span></p></div><div class="closing-stage scene-art" data-tilt><div class="closing-halo" aria-hidden="true"></div><div class="closing-rings" aria-hidden="true"><i></i><i></i><i></i></div><div class="closing-mark"><span>Jianhui</span><em>庄剑辉</em></div><p class="closing-caption">以好奇开始，以作品回答。<span>AI 应用开发 · 多 AI 协作 · 2026</span></p></div></div>
-</section>
+  <section class="sec" id="research">
+    <header class="sec-head">
+      <p class="kicker rv"><span>05</span>第一作者 · 期刊投稿中</p>
+      <h2 class="display sm">让好奇心，<br>经过验证。</h2>
+      <p class="lede rv">观察频率如何影响生态安全评价与预测？我驱动 3 个 AI 分工协作，推进研究全流程。</p>
+    </header>
+    <dl class="stat-row rv">
+      <div><dt>2005–2023</dt><dd>祁连山历史观测数据</dd></div>
+      <div><dt>3 类模型</dt><dd>比较 · 滚动验证 · 敏感性分析</dd></div>
+      <div><dt>第一作者</dt><dd>Journal of Mountain Science</dd></div>
+    </dl>
+    <ol class="timeline" id="research-steps"></ol>
+    <div class="sec-foot rv">
+      <p class="paper">Observation frequency and forecast reliability of ecological security indices in the Qilian Mountain region, China</p>
+      <button class="link-btn" data-detail="research">完整研究过程 <i>↗</i></button>
+    </div>
+  </section>
+
+  <section class="sec sec--ink" id="honors">
+    <header class="sec-head">
+      <p class="kicker rv"><span>06</span>竞赛与成长</p>
+      <h2 class="display sm">每一份成绩，<br>都有来路。</h2>
+    </header>
+    <div class="honor-list" id="honor-list"></div>
+    <div class="cert-gallery" id="cert-gallery"></div>
+    <div class="sec-foot rv">
+      <button class="link-btn" data-detail="honors">全部获奖与实践 <i>↗</i></button>
+    </div>
+  </section>
+
+  <section class="sec contact" id="contact">
+    <p class="kicker rv"><span>07</span>联系</p>
+    <h2 class="display">保持好奇。<br>继续创造。</h2>
+    <p class="lede rv">我是庄剑辉，专注 AI 应用开发与多 AI 协作。期待把下一次合作，做成新的成果。</p>
+    <div class="mail-row rv">
+      <a class="mail" href="mailto:3282016034@qq.com">3282016034@qq.com</a>
+      <button class="copy" type="button">复制邮箱</button>
+    </div>
+    <dl class="facts rv">
+      <div><dt>学校</dt><dd>深圳信息职业技术大学 · 软件技术（工业软件应用开发）</dd></div>
+      <div><dt>在读</dt><dd>2025.09 — 2028.08（预计）</dd></div>
+      <div><dt>所在地</dt><dd>广东 · 深圳</dd></div>
+    </dl>
+    <footer class="foot">
+      <span>© 2026 庄剑辉</span>
+      <span>本站内容均为本人独立或主导完成</span>
+      <a href="#hero">回到顶部 ↑</a>
+    </footer>
+  </section>
 </main>
-<div class="cine-vignette" aria-hidden="true"></div>
-<div class="cine-flash" aria-hidden="true"></div>
-<div class="cursor-glow" aria-hidden="true"></div>
-<footer class="scene-navigation"><div class="scene-status"><span id="scene-number">01</span><span class="scene-divider">/ 07</span><span id="scene-name">认识我</span></div><div class="scene-dots" role="group" aria-label="选择全屏板块"></div><div class="scene-buttons"><button id="replay-opening" aria-label="重播开场动画" title="重播开场">↺</button><span class="gesture-hint">轻滚切换</span><button id="prev-scene" aria-label="上一个板块" disabled>↑</button><button id="next-scene" aria-label="下一个板块">↓</button></div><div class="scene-progress" aria-hidden="true"><span></span></div></footer>
-<div class="sr-only" role="status" aria-live="polite" id="scene-announcer"></div>
-<dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div class="dialog-toolbar"><span id="detail-label">构建与成果</span><button class="dialog-close" data-close="detail-dialog" aria-label="关闭详情">关闭 <span>×</span></button></div><div class="detail-scroll"><h2 id="detail-title"></h2><div id="detail-content"></div></div></dialog>
-<dialog id="certificate-dialog" class="certificate-dialog" aria-labelledby="certificate-title"><div class="dialog-toolbar"><span id="certificate-title">获奖证书</span><button class="dialog-close" data-close="certificate-dialog" aria-label="关闭证书">关闭 <span>×</span></button></div><div class="certificate-view"><img id="certificate-image" alt=""></div><div class="certificate-footer"><button id="certificate-prev" class="circle-button" aria-label="上一张证书">←</button><p id="certificate-caption"></p><button id="certificate-next" class="circle-button" aria-label="下一张证书">→</button></div></dialog>
+
+<dialog id="detail-dialog" class="modal" aria-labelledby="detail-title">
+  <div class="modal-bar"><span id="detail-label">详情</span><button data-close="detail-dialog" aria-label="关闭">关闭 ×</button></div>
+  <div class="modal-scroll">
+    <h2 id="detail-title"></h2>
+    <div id="detail-content"></div>
+  </div>
+</dialog>
+
+<dialog id="certificate-dialog" class="modal modal--cert" aria-labelledby="certificate-title">
+  <div class="modal-bar"><span id="certificate-title">获奖证书</span><button data-close="certificate-dialog" aria-label="关闭">关闭 ×</button></div>
+  <div class="cert-view"><img id="certificate-image" alt=""></div>
+  <div class="cert-foot">
+    <button id="certificate-prev" class="round" aria-label="上一张">←</button>
+    <p id="certificate-caption"></p>
+    <button id="certificate-next" class="round" aria-label="下一张">→</button>
+  </div>
+</dialog>
+
 <div class="toast" role="status" aria-live="polite"></div>
-<noscript><style>.opening,.scene-navigation{display:none}.scene{position:relative!important;visibility:visible!important;opacity:1!important;min-height:100svh}.scene[aria-hidden]{display:block}body{overflow:auto!important}.scene-deck{position:relative!important;height:auto!important}</style><p>开启 JavaScript 可体验整屏切换与作品详情。联系邮箱：3282016034@qq.com。</p></noscript>
-</body></html>
+<noscript><style>.ln>i{transform:none!important}.rv,.project-media{opacity:1!important;transform:none!important}.project-media img{transform:none!important}</style><p class="noscript">开启 JavaScript 可查看完整内容。联系邮箱：3282016034@qq.com</p></noscript>
+<script src="content.js?v=8"></script>
+<script src="site.js?v=8"></script>
+</body>
+</html>
