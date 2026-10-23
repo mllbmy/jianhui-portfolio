@@ -200,12 +200,12 @@
         ghost.getContext('2d').drawImage(canvas, 0, 0);
         canvas.parentElement.prepend(ghost); scenes[index].prepend(canvas);
       }
-      state.previous=state.scene;state.form=media.matches?1:0;state.scene = index; state.energy = media.matches ? 0 : 1.8;
+      state.previous=state.scene;state.form=media.matches?1:0;state.scene = index; state.energy = 0;
       buildPalette();
       if (!state.enabled) draw(0);
     },
     finishTransition() { ghost?.remove(); ghost = null; },
-    pulse(value = 1) { state.energy = Math.max(state.energy, value); },
+    pulse() { /* Shape continuity is preserved without radial bursts. */ },
     getState() { return { ...state }; }
   };
   resize(); start();

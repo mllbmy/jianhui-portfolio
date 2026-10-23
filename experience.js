@@ -10,7 +10,7 @@
  function hasDialog(){return !!$('dialog[open]');}
  function setHeader(index){document.body.classList.toggle('light-scene',scenes[index].dataset.tone==='light');$('#scene-number').textContent=String(index+1).padStart(2,'0');$('#scene-name').textContent=names[index];$('#prev-scene').disabled=index===0;$('#next-scene').disabled=index===scenes.length-1;$('.scene-progress span').style.width=((index+1)/scenes.length*100)+'%';$$('.scene-dots button').forEach((b,i)=>{if(i===index)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});$$('.site-header nav a').forEach(a=>{if(a.hash==='#'+ids[index]||(a.hash==='#projects'&&index===3))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});$('#scene-announcer').textContent=`第 ${index+1} 个板块，共 ${scenes.length} 个：${names[index]}`;}
  function cleanScene(scene){if(gs){gs.set(scene,{clearProps:'transform,clipPath,filter,zIndex'});gs.set($$('.reveal-item,.line-inner,.scene-art',scene),{clearProps:'transform,opacity,filter'});}scene.style.visibility='hidden';scene.style.opacity='0';scene.classList.remove('is-active');scene.inert=true;scene.setAttribute('aria-hidden','true');}
- function settle(index){driftTween?.kill();driftTween=null;scenes.forEach((scene,i)=>{if(i!==index)cleanScene(scene);});const s=scenes[index];if(gs){gs.set(s,{clearProps:'transform,clipPath,filter,zIndex'});gs.set($$('.reveal-item,.line-inner,.scene-art',s),{clearProps:'transform,opacity,filter'});}s.style.visibility='visible';s.style.opacity='1';s.classList.add('is-active');s.inert=false;s.removeAttribute('aria-hidden');current=index;busy=false;document.body.classList.remove('is-turning');document.documentElement.dataset.scene=String(index);sceneState.completedAt=performance.now();setHeader(index);window.portfolioParticles?.finishTransition();gs&&gs.set($('.cine-flash'),{opacity:0});}
+ function settle(index){window.portfolioFX?.stop();driftTween?.kill();driftTween=null;scenes.forEach((scene,i)=>{if(i!==index)cleanScene(scene);});const s=scenes[index];if(gs){gs.set(s,{clearProps:'transform,clipPath,filter,zIndex'});gs.set($$('.reveal-item,.line-inner,.scene-art',s),{clearProps:'transform,opacity,filter'});}s.style.visibility='visible';s.style.opacity='1';s.classList.add('is-active');s.inert=false;s.removeAttribute('aria-hidden');current=index;busy=false;document.body.classList.remove('is-turning');document.documentElement.dataset.scene=String(index);sceneState.completedAt=performance.now();setHeader(index);window.portfolioParticles?.finishTransition();gs&&gs.set($('.cine-flash'),{opacity:0});}
  function navigate(index,options={}){
   index=Math.max(0,Math.min(scenes.length-1,index));if(hasDialog())return false;
   if(opening)finishOpening();
@@ -22,24 +22,20 @@
   from.inert=true;from.setAttribute('aria-hidden','true');to.inert=false;to.removeAttribute('aria-hidden');to.classList.add('is-active');setHeader(index);window.portfolioParticles?.setScene(index);
   if(options.history!=='none'){const href='#'+ids[index];if(options.history==='push')history.pushState(null,'',href);else history.replaceState(null,'',href);}
   if(!gs||reduce.matches||options.instant){settle(index);return true;}
-  const content=$$('.reveal-item',to),art=$('.scene-art',to),lines=$$('.line-inner',to),others=content.filter(el=>!el.matches('h1,h2')),beam=$('.transition-beam');
-  const mode=['rise','orbit','sweep','rise','orbit','sweep','rise'][index];
-  document.documentElement.dataset.transition=mode;
-  const mobile=innerWidth<761,origin=mobile?'54% 58%':'72% 48%',lateral=[0,-25,70,-55,15,45,-20][index];
-  const maskStart=mode==='orbit'?`circle(0% at ${origin})`:mode==='sweep'?'polygon(0% 100%,100% 70%,100% 100%,0% 100%)':'inset(0% 0% 0% 0% round 28px)';
-  const maskEnd=mode==='orbit'?`circle(150% at ${origin})`:mode==='sweep'?'polygon(0% 0%,100% 0%,100% 100%,0% 100%)':'inset(0% 0% 0% 0% round 0px)';
-  gs.set(to,{visibility:'visible',opacity:1,zIndex:4,yPercent:direction*(mode==='rise'?100:16),z:mode==='orbit'?-160:0,scale:mode==='rise'?.87:1,rotationX:mode==='rise'?-14*direction:0,transformOrigin:'50% 50%',clipPath:maskStart});
+  const content=$$('.reveal-item',to),art=$('.scene-art',to),lines=$$('.line-inner',to),others=content.filter(el=>!el.matches('h1,h2'));
+  document.documentElement.dataset.transition=['orbit','collaboration','browser','phones','terrain','certificates','signature'][index];
+  gs.set(to,{visibility:'visible',opacity:0,zIndex:4,yPercent:direction*(innerWidth<761?24:32),scale:.98,transformOrigin:'50% 50%'});
   gs.set(from,{zIndex:3,transformOrigin:'50% 50%'});
-  gs.set(lines,{yPercent:110});gs.set(others,{y:direction*20,opacity:0});
-  gs.set(art,{x:lateral,y:direction*48,z:-170,rotationY:mode==='orbit'?12:-8,scale:.9,opacity:.2});
-  gs.set(beam,{visibility:'hidden'});gs.set('.cine-flash',{opacity:0});
-  window.portfolioFX?.play(index,direction,mode);
+  gs.set(lines,{yPercent:105});gs.set(others,{y:direction*14,opacity:0});
+  gs.set(art,{y:direction*18,opacity:1});
+  gs.set('.transition-beam',{visibility:'hidden'});gs.set('.cine-flash',{opacity:0});
   turn=gs.timeline({onComplete:()=>settle(index),defaults:{overwrite:'auto'}});
-  turn.to(from,{yPercent:-direction*14,z:-180,scale:.86,rotationX:direction*7,opacity:.1,duration:.46,ease:'power2.in'},0)
-   .to(to,{yPercent:0,z:0,scale:1,rotationX:0,clipPath:maskEnd,duration:.72,ease:'power3.out'},0)
-   .to(art,{x:0,y:0,z:0,rotationY:0,scale:1,opacity:1,duration:.66,ease:'power3.out'},.10)
-   .to(lines,{yPercent:0,duration:.53,stagger:.04,ease:'expo.out'},.12)
-   .to(others,{y:0,opacity:1,duration:.38,stagger:.025,ease:'power3.out'},.19);
+  turn.to(from,{yPercent:-direction*12,scale:.97,opacity:0,duration:.46,ease:'power2.inOut'},0)
+   .to(to,{yPercent:0,scale:1,opacity:1,duration:.76,ease:'power3.out'},.02)
+   .to(art,{y:0,duration:.72,ease:'power3.out'},.06)
+   .to(lines,{yPercent:0,duration:.48,stagger:.035,ease:'expo.out'},.16)
+   .to(others,{y:0,opacity:1,duration:.38,stagger:.02,ease:'power3.out'},.22);
+  window.portfolioFX?.compose(turn,to,index,direction);
   return true;
  }
  function finishOpening(){openingTimeline?.kill();openingTimeline=null;opening=false;$('.opening').classList.remove('is-playing');$('.opening').setAttribute('aria-hidden','true');$('#skip-opening').tabIndex=-1;if(gs)gs.set($$('.reveal-item,.line-inner,.scene-art',scenes[current]),{clearProps:'transform,opacity'});}
@@ -49,7 +45,7 @@
   opening=true;const overlay=$('.opening');overlay.classList.add('is-playing');overlay.removeAttribute('aria-hidden');$('#skip-opening').tabIndex=0;
   gs.set('.opening-shutter',{yPercent:0});gs.set('.opening-word',{y:14,opacity:0,scale:.96});gs.set('.opening-line',{scaleX:0,opacity:1});
   openingTimeline=gs.timeline({onComplete:finishOpening});openingTimeline.to('.opening-word',{y:0,opacity:1,scale:1,duration:.28,ease:'power2.out'},0).to('.opening-line',{scaleX:1,duration:.3,ease:'power3.inOut'},.23).to('.opening-word',{opacity:0,scale:1.08,duration:.2},.46).to('.shutter-top',{yPercent:-101,duration:.55,ease:'power3.inOut'},.45).to('.shutter-bottom',{yPercent:101,duration:.55,ease:'power3.inOut'},.45).to('.opening-line',{opacity:0,duration:.25},.61).fromTo($$('.reveal-item',scenes[current]),{y:24,opacity:0},{y:0,opacity:1,duration:.45,stagger:.025,ease:'power3.out'},.56);
-  window.portfolioParticles?.pulse(2);gs.delayedCall(.4,()=>{if(opening)window.portfolioFX?.play(current,1,'orbit');});
+  // Opening resolves directly into the current scene without a separate visual overlay.
  }
  // premium motion: split every headline into masked lines so each row can rise on its own
  $$('.scene h1, .scene h2').forEach(function(h){if(h.dataset.lines)return;var parts=h.innerHTML.split(/<br\s*\/?>/i);h.innerHTML=parts.map(function(p){return '<span class="line-mask"><span class="line-inner">'+p+'</span></span>';}).join('');h.dataset.lines='1';});
@@ -144,6 +140,6 @@
  const warm=()=>$$('.scene img').forEach(img=>{if(img.decode)img.decode().catch(()=>{});});
  if('requestIdleCallback' in window)requestIdleCallback(warm,{timeout:1400});else setTimeout(warm,700);
  current=resolveHash();settle(current);window.portfolioParticles?.setScene(current);
- let seen=false;try{seen=sessionStorage.getItem('jianhui-opening-v8')==='1';sessionStorage.setItem('jianhui-opening-v8','1');}catch{}
+ let seen=false;try{seen=sessionStorage.getItem('jianhui-opening-v9')==='1';sessionStorage.setItem('jianhui-opening-v9','1');}catch{}
  if(!seen&&!location.hash&&!reduce.matches)playOpening();else finishOpening();
 })();

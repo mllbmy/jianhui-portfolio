@@ -133,3 +133,8 @@ body.is-turning .scene .scene-art,body.is-turning .scene .reveal-item{will-chang
 @media(prefers-reduced-motion:reduce){#transition-particles{display:none!important}.feature-float,.orbit-dot{animation:none!important}}
 
 @media(orientation:landscape) and (max-height:520px){.hero-copy h1{font-size:38px;margin-bottom:10px}}
+
+/* Actual artwork owns its entrance and finishes at its original layout. */
+.scene-research .terrain,.scene-research .scan-line{animation:none!important;stroke-dasharray:none;stroke-dashoffset:0}
+.featured-certificate:after{display:none}
+.is-turning .feature-float,.is-turning .orbit-label,.is-turning .audio-wave i,.is-turning .closing-rings i{animation-play-state:paused}
