@@ -6,7 +6,7 @@
 .js-motion:not(.static-story) .chapter:not([data-index="0"]) h2{font-size:clamp(30px,3.1vw,46px);line-height:1.45}
 .exhibition{position:relative;isolation:isolate;width:calc(100% - 32px);margin:0 auto;padding-bottom:max(250px,42svh)}
 .lift-page{position:relative;width:100%;margin:0;border:1px solid #d9dce3;border-radius:34px 34px 0 0;overflow:clip;background:#fff;padding:38px 0 95px;box-shadow:0 -16px 65px #0c14221a;scroll-margin-top:90px;transform-origin:50% calc(100% - 45svh)}
-.exhibit-motion .lift-page{position:sticky;top:var(--pin-top,78px);transform:translate3d(0,var(--recede-y,0px),0) scale(var(--recede-scale,1));filter:brightness(var(--surface-light,1));will-change:transform}
+.exhibit-motion .lift-page{position:sticky;top:var(--pin-top,78px);transform:translate3d(0,var(--recede-y,0px),0) scale(var(--recede-scale,1));filter:brightness(var(--surface-light,1)) blur(var(--surface-soften,0px));will-change:transform}
 .exhibit-motion .lift-page:not(:last-child){margin-bottom:max(250px,42svh)}
 .lift-page[data-lift="0"]{z-index:1;background:#fff}
 .lift-page[data-lift="1"]{z-index:2;background:#07090d;border-color:#252b38;color:#e5ebf7}

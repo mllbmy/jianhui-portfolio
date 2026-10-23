@@ -27,9 +27,10 @@
       const next = measurements[i + 1];
       const cover = enabled && next ? clamp((innerHeight - (deckTop + next.top - scrollY)) / (innerHeight - 80)) : 0;
       const depth = cover * cover * (3 - 2 * cover);
-      page.style.setProperty('--recede-scale', (1 - .035 * depth).toFixed(4));
-      page.style.setProperty('--recede-y', (-24 * depth).toFixed(2) + 'px');
-      page.style.setProperty('--surface-light', (1 - .2 * depth).toFixed(3));
+      page.style.setProperty('--recede-scale', (1 - .065 * depth).toFixed(4));
+      page.style.setProperty('--recede-y', (-38 * depth).toFixed(2) + 'px');
+      page.style.setProperty('--surface-light', (1 - .27 * depth).toFixed(3));
+      page.style.setProperty('--surface-soften', (1.4 * depth).toFixed(2) + 'px');
       page.dataset.covered = cover > .95 ? 'true' : 'false';
     });
   }
@@ -40,7 +41,9 @@
     const i = pages.indexOf(page);
     const bounds = page.getBoundingClientRect(), scale = bounds.width / page.offsetWidth;
     const local = target === page ? 0 : (target.getBoundingClientRect().top - bounds.top) / scale;
-    scrollTo({top:deckTop + measurements[i].top + Math.max(0, local) - (innerWidth <= 760 ? 75 : 90),behavior:reduced.matches ? 'instant' : behavior});
+    const y = deckTop + measurements[i].top + Math.max(0, local) - (innerWidth <= 760 ? 75 : 90);
+    if(window.portfolioPager && behavior !== 'instant')window.portfolioPager.toY(y);
+    else scrollTo({top:y,behavior:reduced.matches ? 'instant' : behavior});
     return true;
   }
   document.addEventListener('click', event => {

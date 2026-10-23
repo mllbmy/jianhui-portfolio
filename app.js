@@ -41,14 +41,17 @@
       const lift = $('.story-copy').offsetHeight + 65;
       const arrive = i => {
         if (!i) return 1;
-        const t = Math.max(0, Math.min(1, (cursor - (i - .64)) / .64));
+        const settledOffset = .018 * 3.6;
+        const start = i === 1 ? 0 : i - 1 + settledOffset;
+        const end = i + settledOffset;
+        const t = Math.max(0, Math.min(1, (cursor - start) / (end - start)));
         return t * t * (3 - 2 * t);
       };
       panels.forEach((panel, i) => {
         const enter = arrive(i), cover = i < 3 ? arrive(i + 1) : 0;
         panel.style.opacity = enter > .001 ? String(1 - cover) : '0';
         panel.style.transform = `translate3d(0,${((1 - enter) * lift - cover * 16).toFixed(2)}px,0) scale(${(1 - cover * .045).toFixed(4)}) rotateX(${((1 - enter) * -7 + cover * 2).toFixed(2)}deg)`;
-        panel.style.filter = `brightness(${(1 - cover * .3).toFixed(3)})`;
+        panel.style.filter = `brightness(${(1 - cover * .3).toFixed(3)}) blur(${((1 - enter) * 3 + cover * 2).toFixed(2)}px)`;
         panel.style.zIndex = String(i + 1);
       });
     } else $$('.chapter').forEach(panel => { panel.style.cssText = ''; });
@@ -68,6 +71,7 @@
   });
   $$('.chapter-nav button').forEach(button => button.addEventListener('click', () => {
     const index = Number(button.dataset.go);
+    if (window.portfolioPager) { window.portfolioPager.intro(index); return; }
     if (reducedMotion || compactViewport.matches) { $$('.chapter')[index].scrollIntoView({behavior:'instant',block:'center'}); return; }
     scrollTo({ top: story.offsetTop + (story.offsetHeight - innerHeight) * (index / 3.6 + .018), behavior: 'smooth' });
   }));
