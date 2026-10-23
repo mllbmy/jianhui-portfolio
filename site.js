@@ -21,7 +21,7 @@
   if (steps) {
     steps.innerHTML = C.methods.map((m, i) => {
       const [n, label] = split(m[0]);
-      return '<li class="step rv" style="--i:' + i + '"><span class="n">' + n + ' — ' + label + '</span><h3>' + m[1] + '</h3><p>' + m[2] + '</p></li>';
+      return '<li class="step rv" style="--n:' + i + '"><span class="n">' + n + ' — ' + label + '</span><h3>' + m[1] + '</h3><p>' + m[2] + '</p></li>';
     }).join('');
   }
 
@@ -52,7 +52,7 @@
     const gallery = $('#cert-gallery');
     if (!gallery || !list.length) return;
     gallery.innerHTML = list.map((c, i) => (
-      '<button class="cert rv" data-cert="' + i + '" aria-label="查看' + c.title + '证书"><img src="' + c.image + '" alt="' + c.title + '" loading="lazy"><span>' + c.title + '</span></button>'
+      '<button class="cert rv" style="--n:' + (i % 3) + '" data-cursor="查看证书" data-cert="' + i + '" aria-label="查看' + c.title + '证书"><img src="' + c.image + '" alt="' + c.title + '" loading="lazy"><span>' + c.title + '</span></button>'
     )).join('');
     observe($$('.cert'));
   });
@@ -175,14 +175,22 @@
 
   /* ---------- 阅读进度 ---------- */
   const bar = $('.progress i');
+  const heroTitle = $('.hero .display');
+  const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   let ticking = false;
   function onScroll() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
+      const y = scrollY;
       const h = document.documentElement.scrollHeight - innerHeight;
-      const p = h > 0 ? Math.min(1, Math.max(0, scrollY / h)) : 0;
+      const p = h > 0 ? Math.min(1, Math.max(0, y / h)) : 0;
       if (bar) bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+      if (heroTitle && !calm() && innerWidth > 760 && y < innerHeight * 1.4) {
+        const t = Math.min(1, y / (innerHeight * 0.85));
+        heroTitle.style.transform = 'translate3d(0,' + (y * -0.085).toFixed(2) + 'px,0)';
+        heroTitle.style.opacity = String(Math.max(0, 1 - t * 0.85));
+      }
       ticking = false;
     });
   }
@@ -226,13 +234,21 @@
   /* ---------- 光标 ---------- */
   const cursor = $('.cursor');
   if (cursor && matchMedia('(pointer:fine)').matches) {
-    const dot = $('.dot', cursor), ring = $('.ring', cursor);
+    const dot = $('.dot', cursor), ring = $('.ring', cursor), label = $('.label', cursor);
     let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
     addEventListener('pointermove', e => {
       mx = e.clientX; my = e.clientY;
       cursor.classList.add('on');
       dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
       cursor.classList.toggle('is-hot', !!e.target.closest('a,button,.cert,.phone'));
+      const tip = e.target.closest('[data-cursor]');
+      if (tip) {
+        label.textContent = tip.dataset.cursor || '查看';
+        label.style.transform = 'translate3d(' + (mx + 18) + 'px,' + (my + 16) + 'px,0)';
+        cursor.classList.add('show-label');
+      } else {
+        cursor.classList.remove('show-label');
+      }
     }, { passive: true });
     (function loop() {
       rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
