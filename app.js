@@ -9,8 +9,6 @@
   const $$ = (s, scope = document) => [...scope.querySelectorAll(s)];
   const story = $('#story'), frame = $('.story-frame');
   let chapter = -1, pendingScroll = false;
-  const topLabels = ['PYTHON / AI DEVELOPMENT', 'LOGIC / PROBLEM SOLVING', 'DESIGN / BUILD / ITERATE', 'HUMAN DIRECTION / AI COLLABORATION'];
-  const bottomLabels = ['探索 · 构建 · 验证', '码蹄杯 · 个人赛国赛银奖', '独立开发 · 两件作品', '第一作者 · 期刊投稿中'];
   function setChapter(next, force = false) {
     if (next === chapter && !force) return;
     chapter = next;
@@ -36,7 +34,6 @@
     const progress = Math.max(0, Math.min(.9999, (scrollY - story.offsetTop) / Math.max(1, range)));
     window.portfolioProgress = progress;
     setChapter(Math.min(3, Math.floor(progress * 4)));
-    document.body.classList.toggle('story-dark', !reducedMotion && !compactViewport.matches && (chapter === 1 || chapter === 3) && story.getBoundingClientRect().bottom > innerHeight * .5);
   }
   addEventListener('scroll', () => { if (!pendingScroll) { pendingScroll = true; requestAnimationFrame(updateScroll); } }, { passive: true });
   addEventListener('resize', updateScroll, { passive: true });
