@@ -143,7 +143,7 @@
       return button;
     }));
   }
-  fetch('assets/certificates.json').then(response => { if (!response.ok) throw new Error('certificate manifest'); return response.json(); }).then(data => { certificates = data; renderCertificates(); }).catch(() => {
+  fetch('assets/certificates.json?v=4').then(response => { if (!response.ok) throw new Error('certificate manifest'); return response.json(); }).then(data => { certificates = data; renderCertificates(); }).catch(() => {
     const p = document.createElement('p'); p.textContent = '证书图片暂未加载，请刷新后重试。'; grid.append(p);
   });
   $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
