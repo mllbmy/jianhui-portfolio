@@ -36,3 +36,4 @@
 .education-inline{font-size:11px}
 @media(max-width:760px){.story-frame{grid-template-rows:360px 1fr}.story-copy{height:360px}.education-inline{font-size:8.5px}.hero-evidence span{font-size:8px}.stage-dock button{min-height:44px}.stage-hint{display:none}.chapter-nav button{min-height:40px}}
 @media(max-height:740px) and (max-width:760px){.story-frame{grid-template-rows:280px 1fr}.story-copy{height:280px}.education-inline{font-size:7.5px}.hero-evidence span{font-size:7px}.stage-dock button{min-height:39px}.chapter-nav button{min-height:35px}}
+:root{--secondary:#676b75}.hero-evidence span,.education-inline,.stage-caption>div>span,.stage-hint{color:#6b7381}.stage-dock button{color:#65748d}.stage-dock button.active{color:#435e88}.about-strip>div>p:not(.eyebrow){color:#626b78}@media(max-width:760px){.stage-award{display:none}.chapter-nav button{min-height:44px}}@media(max-height:740px) and (max-width:760px){.chapter-nav button{min-height:36px}}
