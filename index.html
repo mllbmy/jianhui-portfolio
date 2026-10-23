@@ -8,8 +8,10 @@
   <title>庄剑辉 · AI应用开发与多AI协作作品集</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="chapters.css">
   <script src="app.js" defer></script>
   <script src="showcase.js" defer></script>
+  <script src="chapters.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#projects">跳过开场，直接查看作品</a>
@@ -81,7 +83,7 @@
               <span class="stage-ground" aria-hidden="true"></span>
             </div>
           </div>
-          <div class="stage-caption"><div><span id="stage-type">我的作品</span><strong id="stage-title">从想法，到可以体验的成果。</strong></div><a id="stage-open" href="#projects" aria-label="查看作品详情"><span>查看作品</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div>
+          <div class="stage-caption"><div><span id="stage-type">我的作品</span><strong id="stage-title">从需求，到有成果的作品。</strong></div><a id="stage-open" href="#projects" aria-label="查看作品详情"><span>查看作品</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></div>
           <div class="stage-dock" aria-label="切换作品焦点"><button data-focus="overview" class="active" aria-pressed="true">总览</button><button data-focus="career" aria-pressed="false">职业智能体</button><button data-focus="soundlane" aria-pressed="false">SoundLane</button><button data-focus="research" aria-pressed="false">研究</button></div>
           <p class="stage-hint">点击切换作品 · 电脑可移动鼠标查看空间层次</p>
         </div>
@@ -97,26 +99,47 @@
       </div>
     </section>
 
-    <section class="projects section-wrap" id="projects">
-      <div class="section-heading reveal"><div><p class="eyebrow">项目作品</p><h2>看作品，<span>也看我做了什么。</span></h2></div><p>两件作品，两种探索。<br>点击进入，亲自体验。</p></div>
+    <div class="exhibition" id="exhibition" aria-label="作品、研究与获奖实践的三个滚动章节">
+    <section class="projects lift-page" id="projects" data-lift="0">
+      <div class="section-wrap">
+      <div class="surface-head"><span>作品 · 从需求到成果</span><span>01 / 03</span></div>
+      <div class="section-heading"><div><p class="eyebrow">两项独立获奖作品</p><h2>怎么做出来。<br><span>做出了什么。</span></h2></div><p>从需求、构建到验证，呈现我的工作。<br>依赛事保密要求，展示过程与成果。</p></div>
       <div class="project-grid">
-        <article class="project-card career-card reveal">
+        <article class="project-card career-card" id="career-case">
           <div class="project-art career-art">
-            <div class="art-topline"><span><i></i> CAREER EXPLORER</span><span>01 / WEB</span></div>
-            <div class="live-browser"><span class="live-browser-bar"><i></i><i></i><i></i><span>职业规划智能体 · 实际网站界面</span></span><img src="assets/images/career-live.jpg" alt="职业规划智能体网站实际界面" width="1440" height="1000" loading="lazy"></div>
-            <span class="art-caption">独立开发 · 从需求到可运行网站</span>
+            <div class="art-topline"><span><i></i> 职业规划智能体</span><span>网站应用</span></div>
+            <div class="live-browser"><span class="live-browser-bar"><i></i><i></i><i></i><span>作品界面节选</span></span><img src="assets/images/career-live.jpg" alt="职业规划智能体的作品界面节选" width="1440" height="1000" loading="lazy"></div>
+            <span class="art-caption">独立开发 · 2026.04</span>
           </div>
-          <div class="project-body"><div class="project-meta"><span>AI 应用 / 2026.04</span><span>独立开发</span></div><h3>职业规划智能体</h3><div class="project-award-badge"><span>获奖成果</span>全国赛三等奖 · 初赛小组第一名</div><p>把岗位探索、发展路径、成长方案和简历分析，整合进一个职业规划网站。</p><div class="tag-row"><span>AI 工作流</span><span>岗位探索</span><span>简历解析</span></div><div class="project-links"><a class="button button-dark" href="http://119.91.227.168:5175/" target="_blank" rel="noopener noreferrer">访问项目网站 <span>↗</span></a><button class="detail-toggle" aria-expanded="false" aria-controls="career-detail">项目详情 <span>+</span></button></div><div class="project-detail" id="career-detail" hidden><p><b>我的工作</b>独立完成网站开发，梳理功能需求，使用 TRAE 驱动 AI 辅助编码，审核生成结果并测试、迭代功能。</p><p><b>项目成果</b>第十七届中国大学生服务外包创新创业大赛：初赛小组第一名，全国赛企业命题类三等奖。</p><a class="raw-url" href="http://119.91.227.168:5175/" target="_blank" rel="noopener noreferrer">http://119.91.227.168:5175/ ↗</a></div></div>
+          <div class="project-body">
+            <div class="project-meta"><span>企业命题 / AI 应用</span><span>独立开发</span></div>
+            <h3>职业规划智能体</h3>
+            <div class="project-award-badge"><span>服务外包大赛</span>全国赛三等奖 · 初赛小组第一名</div>
+            <p>围绕企业提出的需求，把岗位探索、晋升与转岗路径、成长方案及 AI 简历解析，整合成可运行的职业规划网站。</p>
+            <ol class="build-flow"><li><span>需求</span>梳理职业规划场景</li><li><span>构建</span>TRAE 辅助实现功能</li><li><span>验证</span>人工审核、测试迭代</li></ol>
+            <div class="project-links"><button class="detail-toggle button button-dark" aria-expanded="false" aria-controls="career-detail">构建过程与贡献 <span>+</span></button><button class="proof-link" data-proof="outsourcing-national-third">获奖证明 <span>↗</span></button></div>
+            <div class="project-detail" id="career-detail" hidden><p><b>从企业需求开始</b>将岗位探索、发展路径和简历分析拆分为具体功能，梳理页面与交互流程。</p><p><b>用 AI 推进，由我审核</b>独立完成网站开发，使用 TRAE 驱动 AI 辅助编码；检查生成结果，测试功能，再持续迭代。</p><p><b>完成作品并接受竞赛检验</b>第十七届中国大学生服务外包创新创业大赛：初赛小组第一名，全国赛企业命题类三等奖。</p></div>
+          </div>
         </article>
-        <article class="project-card soundlane-card reveal">
-          <div class="project-art soundlane-art"><div class="art-topline"><span><i></i> SOUNDLANE</span><span>02 / PROTOTYPE</span></div><div class="phone-composition"><img class="phone phone-back" src="assets/images/soundlane-guard.jpg" alt="SoundLane 守护人功能界面" loading="lazy" width="832" height="1800"><img class="phone phone-front" src="assets/images/soundlane-home.jpg" alt="SoundLane 应用首页，包括导航、AI 视觉、语音与守护人功能" loading="lazy" width="832" height="1800"></div><span class="soundwave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="art-caption">实际作品界面</span></div>
-          <div class="project-body"><div class="project-meta"><span>无障碍交互 / 2026.08</span><span>独立完成</span></div><h3>SoundLane</h3><div class="project-award-badge"><span>获奖成果</span>移动应用创新赛 · 华南赛区一等奖</div><p>面向视障出行场景的交互原型，探索导航、AI 视觉识别、语音反馈与守护人协同。</p><div class="tag-row"><span>TensorFlow.js</span><span>COCO-SSD</span><span>语音交互</span></div><div class="project-links"><a class="button button-dark" href="soundlane/" target="_blank" rel="noopener">体验交互原型 <span>↗</span></a><button class="detail-toggle" aria-expanded="false" aria-controls="soundlane-detail">项目详情 <span>+</span></button></div><div class="project-detail" id="soundlane-detail" hidden><p><b>我的工作</b>独立完成需求分析、交互设计、AI 辅助编码、功能测试、作品文档与答辩。</p><p><b>技术实践</b>HTML / CSS / JavaScript、TensorFlow.js、COCO-SSD、Leaflet 与浏览器语音能力。</p><p><b>项目成果</b>2026 中国高校计算机大赛移动应用创新赛，启明赛道（高教组）华南赛区一等奖。</p><p class="project-note">当前为可运行、可点击的作品原型，部分场景使用演示数据，尚未投入实际出行使用。</p></div></div>
+        <article class="project-card soundlane-card" id="soundlane-case">
+          <div class="project-art soundlane-art"><div class="art-topline"><span><i></i> SoundLane</span><span>应用交互原型</span></div><div class="phone-composition"><img class="phone phone-back" src="assets/images/soundlane-guard.jpg" alt="SoundLane 守护人功能的作品界面节选" loading="lazy" width="832" height="1800"><img class="phone phone-front" src="assets/images/soundlane-home.jpg" alt="SoundLane 首页的作品界面节选" loading="lazy" width="832" height="1800"></div><span class="soundwave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="art-caption">独立完成 · 2026.08</span></div>
+          <div class="project-body">
+            <div class="project-meta"><span>视障出行 / 无障碍交互</span><span>独立完成</span></div><h3>SoundLane</h3>
+            <div class="project-award-badge"><span>移动应用创新赛</span>华南赛区一等奖</div>
+            <p>从视障出行的用户问题出发，探索导航、AI 视觉识别、语音反馈和守护人协同，形成可运行、可点击的交互原型。</p>
+            <ol class="build-flow"><li><span>定义</span>从用户问题倒推功能</li><li><span>实现</span>AI 辅助编码与整合</li><li><span>交付</span>测试、文档和答辩</li></ol>
+            <div class="project-links"><button class="detail-toggle button button-dark" aria-expanded="false" aria-controls="soundlane-detail">构建过程与贡献 <span>+</span></button><button class="proof-link" data-proof="soundlane-mobile-first">获奖证明 <span>↗</span></button></div>
+            <div class="project-detail" id="soundlane-detail" hidden><p><b>让功能回到用户问题</b>从使用场景倒推功能，梳理需求、竞品分析与交互方案，避免单纯堆叠功能。</p><p><b>独立推进完整流程</b>完成需求分析、交互设计、AI 辅助编码、功能测试、作品文档及答辩。围绕视觉识别、语音反馈与地图交互整合作品。</p><p><b>交付与成果</b>第十一届中国高校计算机大赛移动应用创新赛，启明赛道（高教组）华南赛区一等奖。作品处于交互原型阶段，尚未投入实际出行使用。</p></div>
+          </div>
         </article>
+      </div>
+      <p class="case-caption">展示需求分析、构建思路、个人贡献与竞赛成果。</p>
       </div>
     </section>
 
-    <section class="research-section" id="research">
+    <section class="research-section lift-page" id="research" data-lift="1">
       <div class="section-wrap">
+        <div class="surface-head"><span>研究 · 人主导的 AI 协作</span><span>02 / 03</span></div>
         <div class="section-heading reveal"><div><p class="eyebrow">研究与实践</p><h2>好奇心，<span>也要经过验证。</span></h2></div><p>人确定问题、分配任务、审核结果。<br>AI 参与实现，探索由我推进。</p></div>
         <div class="research-layout reveal">
           <div class="paper-overview"><span class="paper-state"><span class="status-dot"></span> 第一作者 · 期刊投稿中</span><h3>观察频率如何影响<br>生态安全评价与预测？</h3><p class="paper-title" lang="en">Observation frequency and forecast reliability of ecological security indices in the Qilian Mountain region, China</p><div class="paper-journal"><span>投稿期刊</span><strong>Journal of Mountain Science</strong></div><div class="paper-facts"><div><strong>2005–2023</strong><span>历史观测数据</span></div><div><strong>3 类模型</strong><span>比较与滚动验证</span></div></div><div class="human-ai-graphic" aria-label="本人驱动三个 AI 协作，并审核结果"><div class="human-node"><small>OWNER / REVIEWER</small><strong>我</strong><span>定义 · 协调 · 审核</span></div><div class="ai-nodes"><span>AI 01</span><span>AI 02</span><span>AI 03</span></div></div></div>
@@ -134,13 +157,27 @@
       </div>
     </section>
 
-    <section class="honors section-wrap" id="honors">
-      <div class="section-heading reveal"><div><p class="eyebrow">竞赛与认证</p><h2>每一次尝试，<span>都有回响。</span></h2></div><p>从算法竞赛到项目实践，<br>记录探索，也记录成长。</p></div>
-      <div class="honor-highlights reveal"><div><span>算法竞赛</span><strong>码蹄杯 · 国赛银奖</strong><small>个人赛 / 2026</small></div><div><span>应用实践</span><strong>移动应用创新赛 · 华南一等奖</strong><small>SoundLane / 2026</small></div><div><span>数学建模</span><strong>高教社杯 · 广东省二等奖</strong><small>全国大学生数学建模竞赛</small></div></div>
-      <div class="gallery-toolbar reveal"><p><span class="status-dot"></span> 证书与风采 <span id="gallery-count">9</span></p><div class="gallery-filters" aria-label="筛选证书"><button data-filter="all" class="active" aria-pressed="true">全部</button><button data-filter="competition" aria-pressed="false">竞赛获奖</button><button data-filter="certification" aria-pressed="false">HCIA-AI</button></div></div>
+    <section class="honors lift-page" id="honors" data-lift="2">
+      <div class="section-wrap">
+      <div class="surface-head"><span>获奖 · 每一次实践的进步</span><span>03 / 03</span></div>
+      <div class="section-heading"><div><p class="eyebrow">竞赛中的任务与成长</p><h2>奖项背后，<br><span>是怎样的实践。</span></h2></div><p>解题、开发与现场调试。<br>让比赛任务与个人贡献一起被看见。</p></div>
+      <div class="achievement-tabs" role="tablist" aria-label="查看不同比赛的实践经历">
+        <button id="achievement-tab-0" role="tab" aria-selected="true" aria-controls="achievement-panel" data-achievement="0">码蹄杯</button>
+        <button id="achievement-tab-1" role="tab" aria-selected="false" tabindex="-1" aria-controls="achievement-panel" data-achievement="1">服务外包</button>
+        <button id="achievement-tab-2" role="tab" aria-selected="false" tabindex="-1" aria-controls="achievement-panel" data-achievement="2">移动应用</button>
+        <button id="achievement-tab-3" role="tab" aria-selected="false" tabindex="-1" aria-controls="achievement-panel" data-achievement="3">机器人视觉</button>
+      </div>
+      <div class="achievement-panel" id="achievement-panel" role="tabpanel" aria-labelledby="achievement-tab-0" tabindex="0">
+        <div class="achievement-copy"><p id="achievement-event">第八届码蹄杯全国大学生程序设计大赛</p><h3 id="achievement-title">把复杂问题，<br>拆成可执行的步骤。</h3><strong class="achievement-result" id="achievement-result">国赛银奖 / 省赛金奖</strong><dl><div><dt>赛事任务</dt><dd id="achievement-task">个人赛，在限定时间内完成算法题的设计、编码与调试，通过在线评测检验结果。</dd></div><div><dt>我的实践</dt><dd id="achievement-practice">使用 Python 解题；整理题型与解题思路，依据评测反馈检查边界条件、定位错误并反复调试。</dd></div><div><dt>能力成长</dt><dd id="achievement-growth">练习问题拆解、程序实现与限时调试，让解题过程更有条理。</dd></div></dl></div>
+        <button class="achievement-proof" data-proof="mati-national-silver" aria-label="放大查看码蹄杯国赛银奖证书"><span class="proof-orbit" aria-hidden="true"></span><img id="achievement-image" src="assets/certificates/mati-national-silver.jpg" alt="码蹄杯国赛银奖证书" width="904" height="1280" loading="lazy"><span class="proof-caption">获奖证书 <span>点击放大 ↗</span></span></button>
+      </div>
+      <div class="honor-highlights"><div><span>个人算法竞赛</span><strong>码蹄杯 · 国赛银奖</strong><small>限时解题与在线评测</small></div><div><span>独立应用开发</span><strong>移动应用创新赛 · 华南一等奖</strong><small>需求、交互、开发与测试</small></div><div><span>数学建模</span><strong>高教社杯 · 广东省二等奖</strong><small>将实际问题转为可分析的模型</small></div></div>
+      <div class="gallery-toolbar"><p><span class="status-dot"></span> 更多竞赛经历与认证 <span id="gallery-count">9</span></p><div class="gallery-filters" aria-label="筛选证书"><button data-filter="all" class="active" aria-pressed="true">全部</button><button data-filter="competition" aria-pressed="false">竞赛获奖</button><button data-filter="certification" aria-pressed="false">HCIA-AI</button></div></div>
       <div class="certificate-grid" id="certificate-grid" aria-live="polite"></div>
-      <p class="gallery-hint">点击证书可放大查看 <span>↗</span></p>
+      <p class="gallery-hint">点击查看证书原图 <span>↗</span></p>
+      </div>
     </section>
+    </div>
 
     <section class="about-strip section-wrap reveal"><div><p class="eyebrow">关于我</p><h2>保持好奇。<br>也保持动手的习惯。</h2></div><div><img class="about-portrait" src="assets/images/portrait.jpg" alt="庄剑辉个人照片" width="300" height="400" loading="lazy"><p>我是深圳信息职业技术大学软件技术专业的 2025 级学生，学习工业软件应用开发方向，预计 2028 年 8 月毕业。</p><p>我喜欢把陌生问题拆成可以行动的小步骤，借助 AI 快速尝试，再通过测试和复核推进作品。接下来，希望继续在 AI 应用开发、算法与数据分析中积累扎实的实践。</p><div class="about-tags"><span>深圳</span><span>HCIA-AI</span><span>AI 应用开发方向</span></div></div></section>
     <footer class="contact-section" id="contact"><div class="section-wrap"><div class="contact-top"><p class="eyebrow">联系我</p><span>下一件作品，正在路上。</span></div><h2>让我们，<br><a href="mailto:3282016034@qq.com">聊聊新的可能<span>↗</span></a></h2><div class="contact-bottom"><div><a href="mailto:3282016034@qq.com">3282016034@qq.com</a><button class="copy-email" aria-label="复制邮箱">复制邮箱 <span>⧉</span></button></div><a href="#story" class="back-top">返回顶部 ↑</a></div><div class="footer-line"><span>© 2026 庄剑辉 / JIANHUI ZHUANG</span><span>以好奇开始，以作品回答。</span></div></div></footer>
@@ -148,6 +185,6 @@
 
   <dialog class="certificate-dialog" id="certificate-dialog" aria-labelledby="certificate-dialog-title"><div class="dialog-toolbar"><span id="certificate-dialog-title">证书查看</span><button class="dialog-close" aria-label="关闭证书">关闭 <span>×</span></button></div><div class="dialog-image-wrap"><img id="dialog-image" alt=""></div><div class="dialog-bottom"><button id="certificate-prev" aria-label="上一张证书">←</button><p id="dialog-caption"></p><button id="certificate-next" aria-label="下一张证书">→</button></div></dialog>
   <div class="toast" role="status" aria-live="polite"></div>
-  <noscript><p class="noscript-notice">启用 JavaScript 可体验滚动动画与证书画廊。作品链接与主要介绍仍可直接查看。</p></noscript>
+  <noscript><p class="noscript-notice">启用 JavaScript 可体验滚动动画与证书画廊。项目构建过程与成果介绍仍可直接查看。</p></noscript>
 </body>
 </html>

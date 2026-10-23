@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+  let reducedMotion = motionPreference.matches;
   const compactViewport = matchMedia('(max-height: 550px) and (orientation: landscape)');
   document.documentElement.classList.toggle('static-story', compactViewport.matches);
   window.portfolioStaticStory = compactViewport.matches;
@@ -33,7 +34,24 @@
     const range = story.offsetHeight - innerHeight;
     const progress = Math.max(0, Math.min(.9999, (scrollY - story.offsetTop) / Math.max(1, range)));
     window.portfolioProgress = progress;
-    setChapter(Math.min(3, Math.floor(progress * 4)));
+    const cursor = progress * 3.6;
+    setChapter(Math.min(3, Math.floor(cursor + .3)));
+    if (!reducedMotion && !compactViewport.matches) {
+      const panels = $$('.chapter');
+      const lift = $('.story-copy').offsetHeight + 65;
+      const arrive = i => {
+        if (!i) return 1;
+        const t = Math.max(0, Math.min(1, (cursor - (i - .64)) / .64));
+        return t * t * (3 - 2 * t);
+      };
+      panels.forEach((panel, i) => {
+        const enter = arrive(i), cover = i < 3 ? arrive(i + 1) : 0;
+        panel.style.opacity = enter > .001 ? String(1 - cover) : '0';
+        panel.style.transform = `translate3d(0,${((1 - enter) * lift - cover * 16).toFixed(2)}px,0) scale(${(1 - cover * .045).toFixed(4)}) rotateX(${((1 - enter) * -7 + cover * 2).toFixed(2)}deg)`;
+        panel.style.filter = `brightness(${(1 - cover * .3).toFixed(3)})`;
+        panel.style.zIndex = String(i + 1);
+      });
+    } else $$('.chapter').forEach(panel => { panel.style.cssText = ''; });
   }
   addEventListener('scroll', () => { if (!pendingScroll) { pendingScroll = true; requestAnimationFrame(updateScroll); } }, { passive: true });
   addEventListener('resize', updateScroll, { passive: true });
@@ -43,9 +61,15 @@
     setChapter(Math.max(0, chapter), true);
     updateScroll();
   });
+  motionPreference.addEventListener('change', () => {
+    reducedMotion = motionPreference.matches;
+    document.documentElement.classList.toggle('js-motion', !reducedMotion);
+    setChapter(Math.max(0, chapter), true); updateScroll();
+  });
   $$('.chapter-nav button').forEach(button => button.addEventListener('click', () => {
     const index = Number(button.dataset.go);
-    scrollTo({ top: story.offsetTop + (story.offsetHeight - innerHeight) * (index / 4 + .022), behavior: reducedMotion ? 'instant' : 'smooth' });
+    if (reducedMotion || compactViewport.matches) { $$('.chapter')[index].scrollIntoView({behavior:'instant',block:'center'}); return; }
+    scrollTo({ top: story.offsetTop + (story.offsetHeight - innerHeight) * (index / 3.6 + .018), behavior: 'smooth' });
   }));
   updateScroll();
 
@@ -112,7 +136,9 @@
       wrap.append(img);
       const title = document.createElement('h3'); title.textContent = certificate.title;
       const caption = document.createElement('p'); caption.textContent = certificate.award;
-      button.append(wrap, title, caption);
+      const story = document.createElement('p'); story.className = 'certificate-context'; story.textContent = certificate.context || '';
+      const experience = document.createElement('p'); experience.className = 'certificate-experience'; experience.textContent = certificate.experience || '';
+      button.append(wrap, title, caption, story, experience);
       button.addEventListener('click', () => { lastCertificateButton = button; showCertificate(index); dialog.showModal(); document.body.classList.add('modal-open'); });
       return button;
     }));
@@ -128,6 +154,12 @@
   dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
   $('#certificate-prev').addEventListener('click', () => showCertificate(openedIndex - 1));
   $('#certificate-next').addEventListener('click', () => showCertificate(openedIndex + 1));
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-proof]'); if (!button || !certificates.length) return;
+    if (!visibleCertificates.some(c => c.id === button.dataset.proof)) $('[data-filter="all"]').click();
+    const index = visibleCertificates.findIndex(c => c.id === button.dataset.proof); if (index < 0) return;
+    lastCertificateButton = button; showCertificate(index); dialog.showModal(); document.body.classList.add('modal-open');
+  });
   dialog.addEventListener('keydown', event => { if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); showCertificate(openedIndex + (event.key === 'ArrowRight' ? 1 : -1)); } });
   let toastTimer;
   $('.copy-email').addEventListener('click', async () => {
@@ -141,5 +173,5 @@
     $$('.reveal').forEach(el => observer.observe(el));
   } else $$('.reveal').forEach(el => el.classList.add('in-view'));
 
-  // The material renderer is isolated in experience.js.
+  // Spatial project graphics and rising exhibit surfaces use separate controllers.
 })();

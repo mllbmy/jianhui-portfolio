@@ -5,9 +5,9 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
   const options = {
-    overview: { type: '我的作品', title: '从想法，到可以体验的成果。', href: '#projects', action: '查看作品', awardLabel: '两个项目，独立开发', award: '以作品证明能力' },
-    career: { type: '职业规划智能体 / 独立开发', title: '从岗位探索，到 AI 简历解析。', href: 'http://119.91.227.168:5175/', action: '打开网站', awardLabel: '服务外包创新创业大赛', award: '全国赛三等奖' },
-    soundlane: { type: 'SoundLane / 独立完成', title: '让无障碍出行的想法，变得可体验。', href: 'soundlane/', action: '体验原型', awardLabel: '中国高校计算机大赛', award: '华南赛区一等奖' },
+    overview: { type: '我的作品', title: '从需求，到有成果的作品。', href: '#projects', action: '查看构建与成果', awardLabel: '两个项目，独立开发', award: '以作品证明能力' },
+    career: { type: '职业规划智能体 / 独立开发', title: '从企业命题，到独立构建的网站。', href: '#career-case', action: '构建与成果', awardLabel: '服务外包创新创业大赛', award: '全国赛三等奖' },
+    soundlane: { type: 'SoundLane / 独立完成', title: '从用户问题，到完整作品流程。', href: '#soundlane-case', action: '构建与成果', awardLabel: '中国高校计算机大赛', award: '华南赛区一等奖' },
     research: { type: 'Python 与多 AI 协作研究', title: '数据、模型、验证，推进到完整稿件。', href: '#research', action: '研究过程', awardLabel: 'Journal of Mountain Science', award: '第一作者 · 期刊投稿中' }
   };
   function setFocus(key) {
