@@ -116,3 +116,20 @@ body.is-turning .scene .scene-art,body.is-turning .scene .reveal-item{will-chang
 
 .opening.is-playing #skip-opening{animation:skip-in .5s .35s both}
 @keyframes skip-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Transient energy follows the scene's reveal; it does no work while idle. */
+#transition-particles{position:fixed;inset:0;width:100%;height:100%;z-index:16;pointer-events:none;visibility:hidden}
+.cine-vignette{opacity:.52}
+.scene.is-active .method-orbit .orbit-dot{animation:node-signal 3.2s ease-in-out infinite}
+.scene.is-active .method-orbit .dot-b{animation-delay:.7s}.scene.is-active .method-orbit .dot-c{animation-delay:1.4s}
+@keyframes node-signal{0%,100%{opacity:.35;transform:scale(.8)}45%{opacity:1;transform:scale(1.6)}}
+.scene.is-active .feature-a{animation:feature-breathe 7s ease-in-out infinite}
+.scene.is-active .feature-b{animation:feature-breathe 8s ease-in-out infinite -3s}
+@keyframes feature-breathe{50%{translate:0 -9px}}
+.scene:not(.is-active) #particle-field{visibility:hidden}
+.detail-scroll{scrollbar-color:#8eaadc #e7effb;scrollbar-width:thin}
+@media(max-width:760px) and (max-height:740px){.closing-stage{min-height:170px;height:190px;max-height:30vh;flex:0 0 auto;gap:12px}.closing-caption{font-size:10px}.closing-caption span{font-size:8px}.closing-mark span{font-size:42px}.closing-mark em{font-size:10px}}
+@media(orientation:landscape) and (max-height:520px){.closing-stage{min-height:0;height:250px;max-height:66vh}.closing-mark span{font-size:50px}.closing-caption{font-size:10px}}
+@media(prefers-reduced-motion:reduce){#transition-particles{display:none!important}.feature-float,.orbit-dot{animation:none!important}}
+
+@media(orientation:landscape) and (max-height:520px){.hero-copy h1{font-size:38px;margin-bottom:10px}}

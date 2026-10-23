@@ -8,9 +8,19 @@
   const scenes = [...document.querySelectorAll('.scene')];
   scenes[0]?.prepend(canvas);
 
-  const state = { scene: 0, blend: 0, energy: 0, frames: 0, enabled: !media.matches };
+  const state = { scene: 0, blend: 0, energy: 0, frames: 0, form: 1, previous: 0, interactions: 0, enabled: !media.matches };
   let w = 0, h = 0, dpr = 1, raf = 0, last = 0, time = 0, px = 0, py = 0, tx = 0, ty = 0, small = false, ghost = null;
   let interval = 16, frameCost = 8, samples = 0;
+  let mouseX=-1000,mouseY=-1000;const ripples=[],shapeA=new Float64Array(3),shapeB=new Float64Array(3);
+  function shape(scene,a,lane,offset,t,out){
+    if(scene===1){const lat=(lane-.5)*2.5,r=Math.cos(lat);out[0]=Math.cos(a)*r;out[1]=Math.sin(lat)*.85;out[2]=Math.sin(a)*r*.72;}
+    else if(scene===2){out[0]=(a%TAU/Math.PI-1)*1.25;out[1]=(lane-.5)*1.4+Math.sin(a*2+t*.45)*.14;out[2]=Math.cos(a*1.5+t*.2)*.35;}
+    else if(scene===3){out[0]=Math.cos(a)*1.15;out[1]=Math.sin(a*3+t*.7)*(.18+lane*.23);out[2]=Math.sin(a)*.55+offset;}
+    else if(scene===4){out[0]=(a%TAU/Math.PI-1)*1.2;out[1]=(lane-.5)*1.1-Math.abs(Math.sin(a*3+lane*2))*.45;out[2]=(lane-.5)*.7;}
+    else if(scene===5){const r=.55+lane*.55;out[0]=Math.cos(a)*r;out[1]=Math.sin(a)*r*.58;out[2]=Math.sin(a*2+t*.25)*.17;}
+    else if(scene===6){const r=.4+lane*.7;out[0]=Math.cos(a+lane*.8)*r;out[1]=Math.sin(a+lane*.8)*r*.8;out[2]=Math.sin(a+lane*3)*.35;}
+    else{const radius=1+.12*Math.sin(a*3+t*.18),twist=offset*Math.cos(a*2+t*.18);out[0]=Math.cos(a)*(radius+twist);out[1]=Math.sin(a)*(radius+twist)*.77;out[2]=offset*Math.sin(a*2+t*.18)+.2*Math.sin(a*2);}
+  }
 
   // Depth is quantised into buckets so one frame costs a dozen batched fills, not ~1900 separate ones.
   const LEVELS = 12, LINE_LEVELS = 8;
@@ -35,7 +45,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function buildPalette() {
-    const gain = state.scene === 0 ? 1 : (state.scene === 1 ? .32 : .18);
+    const gain = state.scene === 0 ? 1 : (state.scene === 1 ? .5 : .32);
     for (let i = 0; i < LEVELS; i++) {
       const depth = (i + .5) / LEVELS, a = (.14 + .65 * depth) * gain;
       dotFill[i] = 'rgba(' + Math.round(92 + depth * 92) + ',' + Math.round(145 + depth * 85) + ',255,' + a.toFixed(3) + ')';
@@ -59,7 +69,7 @@
   }
 
   function draw(dt) {
-    time += dt; state.frames++; state.energy *= .91;
+    time += dt; state.frames++; state.energy *= .91; state.form=Math.min(1,state.form+dt*1.7);
     state.blend += (state.scene - state.blend) * .075;
     px += (tx - px) * .055; py += (ty - py) * .055;
     ctx.clearRect(0, 0, w, h);
@@ -67,7 +77,7 @@
     const hero = state.scene === 0;
     const cx = w * (small ? .55 : .75) + px * (small ? 5 : 25), cy = h * (small ? (hero ? .70 : .63) : .48) + py * 20;
     const size = small ? Math.min(w * (hero ? .30 : .36), hero ? h * .15 : h * .23) : Math.min(w * .23, h * .38);
-    const count = small ? 120 : 210, bands = small ? 6 : 9;
+    const count = small ? 96 : 240, bands = small ? 7 : 10;
     const spin = time * .12 + state.blend * .24, rx = -.45 + py * .1, ry = .28 + px * .12;
     const cosX = Math.cos(rx), sinX = Math.sin(rx), cosY = Math.cos(ry), sinY = Math.sin(ry);
     const burst = 1 + state.energy * .32, scene = state.scene;
@@ -102,18 +112,15 @@
       let hasPrev = false, prevX = 0, prevY = 0;
       for (let n = 0; n < count; n++) {
         const u = n / count * TAU, phase = u + spin;
-        const wave = Math.sin(phase * 3 + time * .18), radius = 1 + .12 * wave;
-        const twist = offset * Math.cos(phase * 2 + time * .18);
-        let x = Math.cos(phase) * (radius + twist);
-        let y = Math.sin(phase) * (radius + twist) * .77;
-        let z = offset * Math.sin(phase * 2 + time * .18) + .2 * Math.sin(phase * 2);
-        if (scene === 3) y = y * .6 + Math.sin(phase * 4 + time) * .18;
-        if (scene === 4) { y = y * .3 + Math.sin(phase * 7 + lane) * .12; z += Math.sin(phase * 3) * .15; }
-        x += Math.sin(phase * 2 + time * .3) * field * .07;
+        shape(scene,phase,lane,offset,time,shapeB);
+        let x=shapeB[0],y=shapeB[1],z=shapeB[2];
+        if(state.form<1){shape(state.previous,phase,lane,offset,time,shapeA);const f=1-Math.pow(1-state.form,3);x=shapeA[0]+(x-shapeA[0])*f;y=shapeA[1]+(y-shapeA[1])*f;z=shapeA[2]+(z-shapeA[2])*f;}
         const y1 = y * cosX - z * sinX, z1 = y * sinX + z * cosX;
         const x1 = x * cosY + z1 * sinY, z2 = -x * sinY + z1 * cosY;
         const perspective = 2.8 / (2.8 - z2);
-        const sx = cx + x1 * size * perspective * burst, sy = cy + y1 * size * perspective * burst;
+        let sx = cx + x1 * size * perspective * burst, sy = cy + y1 * size * perspective * burst;
+        if(!small){const dx=sx-mouseX,dy=sy-mouseY,dist=Math.hypot(dx,dy),reach=125;if(dist<reach&&dist>1){const force=(1-dist/reach)*28;sx+=dx/dist*force;sy+=dy/dist*force;}}
+        for(const wave of ripples){const age=time-wave.start,dx=sx-wave.x,dy=sy-wave.y,dist=Math.hypot(dx,dy),radius=age*270,band=Math.max(0,1-Math.abs(dist-radius)/50);if(dist>1){sx+=dx/dist*band*12*(1-age);sy+=dy/dist*band*12*(1-age);}}
         const depth = clamp((z2 + .5) / 1.1, .1, 1);
         const level = clamp((depth * LEVELS) | 0, 0, LEVELS - 1);
         const c = counts[level];
@@ -152,6 +159,8 @@
       for (let i = 0; i < n; i++) { ctx.moveTo(X[i] + R[i], Y[i]); ctx.arc(X[i], Y[i], R[i], 0, TAU); }
       ctx.fillStyle = glowFill[level]; ctx.fill();
     }
+    while(ripples.length&&time-ripples[0].start>1)ripples.shift();
+    for(const ripple of ripples){const age=time-ripple.start;ctx.beginPath();ctx.arc(ripple.x,ripple.y,age*270,0,TAU);ctx.strokeStyle='rgba(125,199,255,'+((1-age)*.38).toFixed(3)+')';ctx.lineWidth=1;ctx.stroke();}
     if (state.energy > .08) {
       const r = size * (.7 + (2 - state.energy) * .6);
       ctx.beginPath(); ctx.ellipse(cx, cy, r, r * .68, -.35, 0, TAU);
@@ -175,7 +184,8 @@
   }
   function start() { if (!raf && state.enabled && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(loop); } }
   function preferences() { state.enabled = !media.matches; if (!state.enabled) { cancelAnimationFrame(raf); raf = 0; state.energy = 0; draw(0); } else start(); }
-  addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; tx = (e.clientX / w - .5) * 2; ty = (e.clientY / h - .5) * 2; }, { passive: true });
+  addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; mouseX=e.clientX;mouseY=e.clientY; tx = (e.clientX / w - .5) * 2; ty = (e.clientY / h - .5) * 2; }, { passive: true });
+  addEventListener('pointerdown',e=>{if(!state.enabled||document.querySelector('dialog[open]'))return;ripples.push({x:e.clientX,y:e.clientY,start:time});if(ripples.length>3)ripples.shift();state.interactions++;},{passive:true});
   addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', () => { document.body.classList.toggle('motion-paused', document.hidden); if (document.hidden) { cancelAnimationFrame(raf); raf = 0; } else start(); });
   media.addEventListener('change', preferences);
@@ -190,7 +200,7 @@
         ghost.getContext('2d').drawImage(canvas, 0, 0);
         canvas.parentElement.prepend(ghost); scenes[index].prepend(canvas);
       }
-      state.scene = index; state.energy = media.matches ? 0 : 1.8;
+      state.previous=state.scene;state.form=media.matches?1:0;state.scene = index; state.energy = media.matches ? 0 : 1.8;
       buildPalette();
       if (!state.enabled) draw(0);
     },
