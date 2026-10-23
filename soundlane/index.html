@@ -1,0 +1,2897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoundLane · 交互原型</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:radial-gradient(1200px 800px at 50% 20%,#1a1a1f 0%,#0b0b0e 60%,#050506 100%);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;
+}
+#stage{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+#phone{
+  position:relative;width:390px;height:844px;border-radius:50px;overflow:hidden;
+  background:#000;border:1px solid #333;box-shadow:0 40px 90px rgba(0,0,0,.8),0 0 0 10px #141416;
+  transform-origin:center;flex:none;
+}
+#statusbar{
+  position:absolute;top:0;left:0;right:0;height:56px;z-index:60;display:flex;
+  align-items:center;justify-content:space-between;padding:0 30px 0 34px;
+  font-size:15px;font-weight:600;color:#fff;pointer-events:none;
+}
+#island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#000;border-radius:20px;z-index:61}
+.sb-right{display:flex;align-items:center;gap:7px}
+.sb-right svg{width:19px;height:12px}
+#app{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden}
+.screen{
+  position:absolute;inset:0;padding:64px 18px 96px;overflow-y:auto;scrollbar-width:none;
+  display:none;flex-direction:column;gap:14px;background:#0a0a0c;
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:flex;animation:pageIn .28s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.nav{
+  position:sticky;top:-64px;margin:-64px -18px 0;padding:78px 14px 10px;z-index:20;
+  background:rgba(10,10,12,.92);backdrop-filter:blur(10px);display:flex;align-items:center;gap:10px;
+}
+.nav .back{width:34px;height:34px;border-radius:50%;background:#1c1c1e;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.nav .back svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.nav .title{font-size:17px;font-weight:700;flex:1}
+.nav .nav-r{display:flex;gap:8px}
+.nav .nav-r .chip{background:#1c1c1e;color:#ffd60a;font-size:12px;padding:6px 10px;border-radius:20px;cursor:pointer}
+h2.s{font-size:26px;font-weight:800;letter-spacing:.5px}
+.sub{font-size:13px;color:#98989f}
+.card{background:#1c1c1e;border-radius:16px;padding:14px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.card-title svg{width:15px;height:15px;flex:none}
+.btn{
+  width:100%;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn.primary{background:#ffd60a;color:#1a1200}
+.btn.primary:active{background:#e6bf00}
+.btn.dark{background:#2c2c2e;color:#fff}
+.btn.danger{background:#ff453a;color:#fff}
+.btn svg{width:18px;height:18px}
+.row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #2c2c2e;cursor:pointer}
+.row:last-child{border-bottom:none}
+.row .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+.row .ic svg{width:19px;height:19px}
+.row .t{flex:1}
+.row .t .n{font-size:15px;font-weight:600}
+.row .t .d{font-size:12px;color:#98989f;margin-top:1px}
+.row .chev{color:#6e6e73;font-size:18px}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:#26262a;color:#ffd60a;border:1px solid #3a3a3e}
+.toggle{width:48px;height:29px;border-radius:16px;background:#48484a;position:relative;cursor:pointer;transition:.2s;flex:none}
+.toggle::after{content:"";position:absolute;top:2.5px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on{background:#30d158}
+.toggle.on::after{left:21px}
+.seg{display:flex;background:#2c2c2e;border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:none;background:transparent;color:#98989f;font-size:13px;font-weight:600;padding:9px 4px;border-radius:9px;cursor:pointer}
+.seg button.on{background:#48484a;color:#fff}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-row input[type=range]{flex:1;accent-color:#ffd60a;height:26px}
+.slider-row .val{font-size:13px;color:#ffd60a;min-width:38px;text-align:right}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qcard{background:#1c1c1e;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:9px;cursor:pointer;border:1px solid transparent;transition:.15s}
+.qcard:active{border-color:#ffd60a}
+.qcard .qi{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.qcard .qi svg{width:20px;height:20px}
+.qcard .qn{font-size:14px;font-weight:700}
+.qcard .qd{font-size:11px;color:#98989f}
+.voice-area{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0 2px}
+.vmic{
+  width:132px;height:132px;border-radius:50%;background:#ffd60a;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;box-shadow:0 12px 40px rgba(255,214,10,.35);
+}
+.vmic svg{width:52px;height:52px}
+.vmic::before,.vmic::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(255,214,10,.35)}
+.vmic.listening::before{animation:pulse 1.2s infinite}
+.vmic.listening::after{animation:pulse 1.2s .4s infinite}
+@keyframes pulse{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+.wave{display:flex;align-items:flex-end;gap:3px;height:22px}
+.wave i{width:4px;background:#ffd60a;border-radius:2px;animation:w 1s infinite}
+.wave i:nth-child(1){height:8px}.wave i:nth-child(2){height:18px;animation-delay:.15s}
+.wave i:nth-child(3){height:12px;animation-delay:.3s}.wave i:nth-child(4){height:20px;animation-delay:.45s}
+.wave i:nth-child(5){height:10px;animation-delay:.2s}.wave i:nth-child(6){height:16px;animation-delay:.35s}
+.wave i:nth-child(7){height:7px}
+@keyframes w{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
+#tabbar{
+  position:absolute;bottom:0;left:0;right:0;height:84px;z-index:50;
+  background:rgba(12,12,14,.95);backdrop-filter:blur(12px);border-top:1px solid #232326;
+  display:flex;align-items:flex-start;justify-content:space-around;padding-top:8px;
+}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 8px;border-radius:12px}
+.tab svg{width:23px;height:23px}
+.tab span{font-size:10.5px;color:#8e8e93;font-weight:600}
+.tab.on svg{fill:#ffd60a}.tab.on span{color:#ffd60a}
+#homeindicator{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#3a3a3c;z-index:55}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#98989f}
+.stat-chip{display:inline-flex;align-items:center;gap:5px;background:#1c1c1e;padding:5px 10px;border-radius:20px;font-size:12px;color:#30d158}
+.stat-chip svg{width:13px;height:13px}
+.live-wrap{position:absolute;inset:0;background:#0a0a0c;display:flex;flex-direction:column;padding:64px 18px 20px}
+.live-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#98989f}
+.progress{height:5px;background:#2c2c2e;border-radius:3px;overflow:hidden;margin:8px 0 2px}
+.progress i{display:block;height:100%;width:10%;background:linear-gradient(90deg,#ffd60a,#ff9f0a);transition:width 5s cubic-bezier(.22,.61,.36,1)}
+.live-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.bigarrow{width:120px;height:120px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1c1c1e;border:2px solid #2c2c2e}
+.bigarrow svg{width:64px;height:64px;stroke:#ffd60a;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.dist{font-size:38px;font-weight:800;letter-spacing:1px}
+.dist small{font-size:16px;font-weight:600;color:#98989f}
+.nextstep{font-size:15px;color:#fff;background:#1c1c1e;padding:10px 18px;border-radius:12px;display:flex;align-items:center;gap:8px}
+.nextstep .dir{color:#ffd60a;font-weight:800}
+.spatial{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(28,28,30,.95),rgba(40,40,46,.95));border-radius:18px;padding:14px 18px;width:100%;position:relative;overflow:hidden;isolation:isolate;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+/* 方向光晕：左侧/右侧出现障碍时仅一道柔光从对应方向流入 */
+.spatial::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at var(--wave-x,50%) 50%,rgba(43,110,240,.18) 0%,rgba(43,110,240,0) 60%);pointer-events:none;transition:all 1.2s cubic-bezier(.4,0,.2,1);z-index:0;opacity:.7}
+/* 顶部微光高光线 */
+.spatial::after{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);z-index:0}
+.spatial .ear{width:38px;height:38px;border-radius:50%;background:rgba(58,58,62,.6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#d1d1d6;position:relative;z-index:1;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);transition:all .45s cubic-bezier(.4,0,.2,1)}
+.spatial .ear.on{background:linear-gradient(135deg,#2b6ef0,#5b88d6);color:#fff;border-color:rgba(91,136,214,.5);box-shadow:0 0 0 4px rgba(43,110,240,.18),0 4px 14px rgba(43,110,240,.4);transform:scale(1.06)}
+.spatial .mid{flex:1;display:flex;align-items:center;gap:5px;justify-content:center;position:relative;z-index:1;height:42px}
+/* 9 根等高线式条形（equalizer）：中心高、两端低，模拟声波从中央向两侧扩散 */
+.spatial .mid i{width:3px;height:8px;border-radius:3px;background:linear-gradient(180deg,rgba(91,136,214,.85) 0%,rgba(91,136,214,.35) 100%);transform-origin:center;transition:all .35s cubic-bezier(.4,0,.2,1);animation:spatialWave 1.8s ease-in-out infinite;animation-delay:calc(var(--i,0)*0.09s);opacity:.7}
+/* 中心条形稍高 */
+.spatial .mid i:nth-child(5){width:3.5px;height:12px}
+/* 方向触发：左侧障碍 → 左侧 4 根条形变高变亮 */
+.spatial.dir-l .mid i:nth-child(-n+4){background:linear-gradient(180deg,#ffd60a 0%,rgba(255,214,10,.4) 100%);height:22px;opacity:1;box-shadow:0 0 10px rgba(255,214,10,.5);animation:none}
+/* 方向触发：右侧障碍 → 右侧 4 根条形变高变亮 */
+.spatial.dir-r .mid i:nth-child(n+6){background:linear-gradient(180deg,#ffd60a 0%,rgba(255,214,10,.4) 100%);height:22px;opacity:1;box-shadow:0 0 10px rgba(255,214,10,.5);animation:none}
+@keyframes spatialWave{
+  0%,100%{height:6px;opacity:.55}
+  50%{height:18px;opacity:1}
+}
+/* 第 1/9 根条形稍短，第 5 根稍长，形成对称衰减 */
+.spatial .mid i:nth-child(1),.spatial .mid i:nth-child(9){height:5px}
+.spatial .mid i:nth-child(2),.spatial .mid i:nth-child(8){height:8px}
+.spatial .mid i:nth-child(3),.spatial .mid i:nth-child(7){height:11px}
+.spatial .mid i:nth-child(4),.spatial .mid i:nth-child(6){height:14px}
+@keyframes spatialWaveSym{
+  0%,100%{transform:scaleY(.7);opacity:.5}
+  50%{transform:scaleY(1.4);opacity:1}
+}
+.spatial .lbl{font-size:11px;color:#98989f;text-align:center;margin-top:4px}
+.live-btns{display:flex;gap:10px;margin-top:10px}
+.live-btns .btn{flex:1;padding:13px}
+.alert{
+  position:absolute;top:64px;left:18px;right:18px;z-index:30;border-radius:16px;padding:14px 16px;
+  background:rgba(255,69,58,.14);border:2px solid #ff453a;display:none;align-items:flex-start;gap:12px;
+  animation:shake .5s ease;
+}
+.alert.show{display:flex}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.alert .ai{width:40px;height:40px;border-radius:50%;background:#ff453a;flex:none;display:flex;align-items:center;justify-content:center}
+.alert .ai svg{width:22px;height:22px;fill:#fff}
+.alert .at{flex:1}
+.alert .at .l1{font-size:15px;font-weight:800;color:#ff6b61}
+.alert .at .l2{font-size:13px;color:#ffd4d1;margin-top:3px}
+.alert .at .l3{font-size:12px;color:#ff9d97;margin-top:2px}
+.busbar{background:#1c1c1e;border-radius:14px;padding:12px 14px;display:none;align-items:center;gap:12px}
+.busbar.show{display:flex}
+.busbar .bi{width:38px;height:38px;border-radius:50%;background:#0a84ff;display:flex;align-items:center;justify-content:center;flex:none}
+.busbar .bi svg{width:20px;height:20px;fill:#fff}
+.busbar .bt{flex:1}
+.busbar .bt .l1{font-size:14px;font-weight:700}
+.busbar .bt .l2{font-size:12px;color:#98989f}
+.arrive-card{position:absolute;inset:0;z-index:35;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:40px}
+.arrive-card.show{display:flex}
+.arrive-card .inner{background:#1c1c1e;border-radius:20px;padding:28px 24px;text-align:center;width:100%}
+.arrive-card .ok{width:70px;height:70px;border-radius:50%;background:#30d158;margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.arrive-card .ok svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.dest-item{display:flex;align-items:center;gap:12px;background:#1c1c1e;border-radius:14px;padding:14px;cursor:pointer;border:1.5px solid transparent}
+.dest-item.sel{border-color:#ffd60a;background:#221c08}
+.dest-item .di{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.dest-item .di svg{width:20px;height:20px}
+.dest-item .dn{font-size:15px;font-weight:700}
+.dest-item .dd{font-size:12px;color:#98989f;margin-top:2px}
+.searchbar{display:flex;align-items:center;gap:8px;background:#1c1c1e;border-radius:14px;padding:12px 14px}
+.searchbar input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:15px}
+.searchbar .mic{width:30px;height:30px;border-radius:50%;background:#2c2c2e;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.searchbar .mic svg{width:15px;height:15px}
+.step{display:flex;gap:12px;position:relative;padding:4px 0 12px}
+.step .line{display:flex;flex-direction:column;align-items:center;flex:none;width:20px}
+.step .dot{width:12px;height:12px;border-radius:50%;background:#ffd60a;margin-top:4px}
+.step .bar{width:3px;flex:1;background:#2c2c2e;border-radius:2px}
+.step .txt{font-size:14px;line-height:1.5}
+.step .txt b{color:#ffd60a}
+.route-meta{display:flex;gap:8px;flex-wrap:wrap}
+.route-meta .m{background:#26262a;border-radius:10px;padding:8px 12px;font-size:12.5px;color:#fff}
+.route-meta .m b{color:#ffd60a}
+.cam{
+  position:relative;border-radius:18px;overflow:hidden;background:#111;aspect-ratio:3/4;
+  display:flex;align-items:center;justify-content:center;border:1px solid #26262a;
+}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.cam .scene{position:absolute;inset:0}
+/* ========== 演示模式场景：真实城市场景（默认亮色版） ========== */
+.scene .sky{position:absolute;inset:0 0 38% 0;background:linear-gradient(180deg,#a8cdf0 0%,#cfe2f5 55%,#e6eff7 100%)}
+.scene .sun{position:absolute;top:14%;right:18%;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff7c8,#ffd770 55%,#ffb648 100%);box-shadow:0 0 28px 8px rgba(255,200,80,.5),0 0 60px 16px rgba(255,180,80,.25);z-index:1}
+.scene .cloud{position:absolute;border-radius:50px;background:linear-gradient(180deg,#fff,#f0f4fa);box-shadow:inset 0 -3px 4px rgba(160,180,210,.18);z-index:2}
+.scene .cloud::before,.scene .cloud::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.scene .cloud.c1{top:18%;left:8%;width:60px;height:14px}.scene .cloud.c1::before{width:24px;height:24px;top:-12px;left:10px}.scene .cloud.c1::after{width:18px;height:18px;top:-8px;right:14px}
+.scene .cloud.c2{top:9%;left:46%;width:46px;height:11px;opacity:.85}.scene .cloud.c2::before{width:18px;height:18px;top:-9px;left:8px}.scene .cloud.c2::after{width:14px;height:14px;top:-6px;right:10px}
+.scene .cloud.c3{top:24%;right:6%;width:38px;height:9px;opacity:.75}.scene .cloud.c3::before{width:14px;height:14px;top:-7px;left:6px}.scene .cloud.c3::after{width:10px;height:10px;top:-4px;right:8px}
+.scene .mountain{position:absolute;bottom:38%;height:46px;background:linear-gradient(180deg,#a8b8c8,#8a9cb0);border-radius:50% 50% 0 0 / 100% 100% 0 0;opacity:.55;z-index:1}
+.scene .mountain.m1{left:14%;width:140px}.scene .mountain.m2{right:18%;width:110px;height:38px;opacity:.45}
+/* 远树（简化的圆冠） */
+.scene .tree-far{position:absolute;bottom:38%;width:18px;height:36px;background:linear-gradient(180deg,#6b8e6f 60%,#5a7860);border-radius:9px 9px 0 0;z-index:2;box-shadow:inset 2px 0 4px rgba(0,0,0,.1)}
+.scene .tree-far::before{content:"";position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:4px;height:8px;background:#6b4f3a}
+.scene .tree-far.tf1{left:6%;height:30px}.scene .tree-far.tf2{left:30%;height:34px;width:16px}.scene .tree-far.tf3{right:8%;height:28px;width:14px}
+/* 建筑群 */
+.scene .bld{position:absolute;bottom:38%;background:#cfd9e6;z-index:3}
+.scene .bld .roof{position:absolute;top:-6px;left:0;right:0;height:8px;background:linear-gradient(180deg,#7a8a9c,#5a6a7c);border-radius:2px 2px 0 0;box-shadow:0 -1px 2px rgba(0,0,0,.15)}
+.scene .bld .facade{position:absolute;inset:0;background:linear-gradient(180deg,#dfe7f0 0%,#b8c4d4 100%);box-shadow:inset -8px 0 14px rgba(0,0,0,.12),inset 8px 0 10px rgba(255,255,255,.4)}
+.scene .bld .win-grid{position:absolute;inset:8px 8px 14px;background:repeating-linear-gradient(0deg,rgba(80,120,160,.55) 0 6px,transparent 6px 14px),repeating-linear-gradient(90deg,rgba(80,120,160,.55) 0 5px,transparent 5px 13px);border-radius:2px;opacity:.85}
+.scene .bld .sign{position:absolute;top:30%;left:0;right:0;height:14px;background:linear-gradient(90deg,#0a84ff,#007aff);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.scene .bld .awning{position:absolute;top:18%;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,#d83a3a 0 4px,#fff 4px 8px);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.scene .bld.b1{left:4%;width:80px;height:108px;border-radius:4px 4px 0 0;box-shadow:0 6px 14px -2px rgba(0,0,0,.25)}
+.scene .bld.b2{left:38%;width:62px;height:84px;border-radius:3px 3px 0 0;box-shadow:0 5px 12px -2px rgba(0,0,0,.22)}
+.scene .bld.b3{right:4%;width:74px;height:96px;border-radius:4px 4px 0 0;box-shadow:0 6px 14px -2px rgba(0,0,0,.25)}
+/* 路灯 */
+.scene .lamp{position:absolute;right:38%;bottom:38%;width:14px;height:54px;z-index:4}
+.scene .lamp .pole{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:2px;height:50px;background:linear-gradient(180deg,#6a6a70,#4a4a50);border-radius:1px}
+.scene .lamp .arm{position:absolute;top:6px;left:50%;width:10px;height:2px;background:#5a5a60}
+.scene .lamp .head{position:absolute;top:3px;left:calc(50% + 8px);width:8px;height:6px;background:#3a3a40;border-radius:1px 2px 2px 1px}
+.scene .lamp .glow{position:absolute;top:6px;left:calc(50% + 12px);width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fff3a8 0%,transparent 70%);opacity:.55}
+/* 地面 / 人行道 / 盲道 */
+.scene .ground{position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(180deg,#e2d6b8 0%,#cdbe9c 100%)}
+.scene .ground::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0 18px,rgba(0,0,0,.03) 18px 19px)}
+.scene .sidewalk{position:absolute;left:0;right:0;bottom:18%;height:20%;background:linear-gradient(180deg,#d6dde6,#b8c2d0);box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.scene .sidewalk::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 1px,transparent 1px 24px),repeating-linear-gradient(0deg,rgba(0,0,0,.04) 0 1px,transparent 1px 18px)}
+.scene .tactile{position:absolute;left:0;bottom:14%;width:24px;height:14%;background:repeating-radial-gradient(circle at 6px 50%,#e8b820 0 2px,transparent 2px 5px);background-color:#c89818;border-top:1px solid rgba(0,0,0,.15);border-bottom:1px solid rgba(0,0,0,.15)}
+/* 道路 */
+.scene .road{position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(180deg,#5a5e66,#3e424a)}
+.scene .road::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.25);transform:translateY(-50%)}
+.scene .lane-line{position:absolute;left:0;right:0;bottom:9%;height:3px;background:repeating-linear-gradient(90deg,#ffd60a 0 14px,transparent 14px 24px);transform:translateY(50%)}
+.scene .crosswalk{position:absolute;left:42%;top:38%;width:54px;height:14%;background:repeating-linear-gradient(90deg,#fff 0 5px,transparent 5px 9px);opacity:.85;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+/* 障碍物 1：三层台阶 */
+.obj-step{position:absolute;left:5%;top:55%;width:60px;height:38px;z-index:6}
+.obj-step .step{position:absolute;left:0;right:0;border-radius:2px;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.obj-step .s1{bottom:0;height:14px;background:linear-gradient(180deg,#b8b8be 0%,#8e8e96 100%)}
+.obj-step .s2{bottom:12px;left:6px;right:6px;height:12px;background:linear-gradient(180deg,#a4a4ac,#7c7c84)}
+.obj-step .s3{bottom:22px;left:12px;right:12px;height:10px;background:linear-gradient(180deg,#90909a,#6a6a72)}
+.obj-step .shadow{position:absolute;left:8px;right:-4px;bottom:-4px;height:6px;background:radial-gradient(ellipse,rgba(0,0,0,.3),transparent 70%);filter:blur(2px)}
+/* 障碍物 2：水坑 */
+.obj-puddle{position:absolute;right:14%;bottom:22%;width:72px;height:22px;z-index:6}
+.obj-puddle .water{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#7eb0d8 0%,#3a6e9a 60%,#1f4a72 100%);box-shadow:0 2px 6px rgba(0,0,0,.35),inset 0 -3px 4px rgba(0,0,0,.2),inset 0 3px 4px rgba(255,255,255,.3)}
+.obj-puddle .ripple{position:absolute;border:1.5px solid rgba(255,255,255,.5);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:puddle-ripple 2.4s ease-out infinite}
+.obj-puddle .r1{width:14px;height:6px;animation-delay:0s}
+.obj-puddle .r2{width:14px;height:6px;animation-delay:1.2s}
+@keyframes puddle-ripple{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}30%{opacity:.9}100%{opacity:0;transform:translate(-50%,-50%) scale(2.6)}}
+/* 障碍物 3：完整行人（站在人行道上） */
+.obj-person{position:absolute;bottom:20%;left:48%;width:24px;height:60px;z-index:6}
+.obj-person .head{position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f0c8a0,#c89a78);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.obj-person .body{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:16px;height:24px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#5a8bcf,#3a6bb0);box-shadow:inset 0 -2px 3px rgba(0,0,0,.15)}
+.obj-person .arm{position:absolute;top:14px;width:5px;height:18px;background:linear-gradient(180deg,#5a8bcf,#3a6bb0);border-radius:2px}
+.obj-person .a1{left:1px;transform:rotate(8deg);transform-origin:top center}
+.obj-person .a2{right:1px;transform:rotate(-12deg);transform-origin:top center}
+.obj-person .leg{position:absolute;top:32px;width:6px;height:22px;background:linear-gradient(180deg,#2a3550,#1a2540);border-radius:2px}
+.obj-person .l1{left:6px}
+.obj-person .l2{right:6px}
+.obj-person .bag{position:absolute;top:18px;right:-6px;width:8px;height:11px;background:linear-gradient(135deg,#8a5a3a,#6a4028);border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.obj-person .shadow{position:absolute;bottom:-3px;left:-4px;right:-4px;height:4px;background:radial-gradient(ellipse,rgba(0,0,0,.35),transparent 70%);filter:blur(2px)}
+/* 障碍物 4：悬空斜伸树枝+少量树叶（高风险） */
+.obj-hang{position:absolute;right:-4%;top:36%;width:96px;height:54px;z-index:5}
+.obj-hang .branch{position:absolute;top:24px;left:-10px;width:108px;height:6px;background:linear-gradient(90deg,#3a2a18 0%,#6a4a2c 40%,#8a5e34 100%);border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.3);transform:rotate(-12deg);transform-origin:right center}
+.obj-hang .branch::before{content:"";position:absolute;top:-10px;left:55%;width:4px;height:14px;background:linear-gradient(180deg,#6a4a2c,#4a2e18);border-radius:2px;transform:rotate(25deg)}
+.obj-hang .branch::after{content:"";position:absolute;top:-6px;left:78%;width:3px;height:9px;background:linear-gradient(180deg,#6a4a2c,#4a2e18);border-radius:2px;transform:rotate(-30deg)}
+.obj-hang .leaves{position:absolute;border-radius:60% 40% 60% 40% / 50% 60% 40% 50%;background:radial-gradient(circle at 30% 30%,#8fc870,#4f8a3a 75%,#2e5a22);box-shadow:inset 0 -2px 3px rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.15)}
+.obj-hang .l1{top:18px;left:30%;width:14px;height:10px;transform:rotate(15deg)}
+.obj-hang .l2{top:8px;left:48%;width:18px;height:13px;transform:rotate(-20deg)}
+.obj-hang .l3{top:14px;left:66%;width:12px;height:9px;transform:rotate(35deg)}
+.obj-hang .shadow{position:absolute;left:20px;right:20px;bottom:6px;height:4px;background:radial-gradient(ellipse,rgba(0,0,0,.25),transparent 70%);filter:blur(2px)}
+.sense-stats{display:flex;gap:8px}
+.sense-stats .s{flex:1;background:#1c1c1e;border-radius:12px;padding:10px;text-align:center}
+.sense-stats .s .v{font-size:19px;font-weight:800;color:#ffd60a}
+.sense-stats .s .k{font-size:11px;color:#98989f;margin-top:2px}
+.mapwrap{position:relative;border-radius:18px;overflow:hidden;background:#17171a;border:1px solid #26262a}
+.mapwrap svg{display:block;width:100%}
+.floors{display:flex;gap:8px}
+.floors .f{flex:1;text-align:center;background:#1c1c1e;padding:10px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid transparent}
+.floors .f.on{border-color:#ffd60a;color:#ffd60a}
+.fam{display:flex;align-items:center;gap:12px;background:#1c1c1e;border-radius:14px;padding:14px}
+.fam .av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex:none}
+.fam .fi{flex:1}
+.fam .fi .n{font-size:15px;font-weight:700}
+.fam .fi .d{font-size:12px;color:#98989f;margin-top:2px}
+.fam .st{font-size:11px;color:#30d158;background:rgba(48,209,88,.12);padding:4px 10px;border-radius:20px;font-weight:600}
+.sos-btn{
+  width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#ff6b61,#ff453a 70%);
+  border:none;color:#fff;font-size:22px;font-weight:800;cursor:pointer;margin:10px auto;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 14px 44px rgba(255,69,58,.4);
+}
+.sos-btn svg{width:34px;height:34px;fill:#fff}
+.sos-btn.counting{animation:pulse .7s infinite}
+.sos-ok{background:#1c1c1e;border-radius:16px;padding:18px;display:none;flex-direction:column;gap:8px;border:2px solid #30d158}
+.sos-ok.show{display:flex}
+.sos-ok .l1{font-size:16px;font-weight:800;color:#30d158}
+.sos-ok .l2{font-size:13px;color:#98989f}
+.quickcall{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quickcall button{background:#1c1c1e;border:1px solid #2c2c2e;color:#ffd60a;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer}
+.mapmini{position:relative;border-radius:16px;overflow:hidden;background:#141416;height:150px;border:1px solid #26262a}
+.mapmini svg{position:absolute;inset:0;width:100%;height:100%}
+.cotype{display:flex;flex-wrap:wrap;gap:8px}
+.cotype button{background:#1c1c1e;border:1.5px solid #2c2c2e;color:#fff;border-radius:20px;padding:8px 14px;font-size:13px;cursor:pointer}
+.cotype button.on{border-color:#ffd60a;color:#ffd60a;background:#221c08}
+#toast{
+  position:absolute;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);z-index:80;
+  background:#2c2c2e;color:#fff;font-size:13px;padding:10px 18px;border-radius:22px;opacity:0;transition:.25s;white-space:nowrap;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#screen-splash{background:radial-gradient(600px 400px at 50% 30%,#241f08 0%,#0a0a0c 70%);align-items:center;justify-content:center;gap:10px;text-align:center}
+.logo{width:110px;height:110px;border-radius:30px;background:linear-gradient(145deg,#ffd60a,#ff9f0a);display:flex;align-items:center;justify-content:center;box-shadow:0 16px 50px rgba(255,214,10,.35)}
+.logo svg{width:60px;height:60px;stroke:#1a1200;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#screen-splash .name{font-size:34px;font-weight:900;letter-spacing:4px;margin-top:6px}
+#screen-splash .slogan{font-size:14px;color:#98989f;margin-top:6px}
+.loaddots{display:flex;gap:6px;margin-top:14px}
+.loaddots i{width:8px;height:8px;border-radius:50%;background:#ffd60a;animation:w 1s infinite}
+.loaddots i:nth-child(2){animation-delay:.2s}.loaddots i:nth-child(3){animation-delay:.4s}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#ffd60a,#ff9f0a);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#1a1200}
+.listen-tip{font-size:14px;color:#ffd60a;min-height:20px;text-align:center}
+</style>
+<!-- Leaflet：首页真实地图（本地资源） -->
+<link rel="stylesheet" href="assets/leaflet/leaflet.min.css">
+<script src="assets/leaflet/leaflet.min.js"></script>
+</head>
+<body><a href="../#projects" style="position:fixed;top:12px;left:14px;z-index:99999;padding:9px 13px;border:1px solid #3c526f;border-radius:20px;background:#0b1830de;color:#dceaff;text-decoration:none;font:12px system-ui;backdrop-filter:blur(8px)">← 返回作品集</a>
+<div class="liquid-bg"></div>
+<div id="stage">
+  <div id="phone">
+    <div id="toast"></div>
+    <div id="island"></div>
+    <div id="statusbar">
+      <span>9:41</span>
+      <div class="sb-right">
+        <svg viewBox="0 0 24 12"><path d="M1 4h15v4H1z M17.5 2v8 M20 0v12" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 20 12"><rect x="1" y="1" width="14" height="10" rx="2" fill="#fff"/><rect x="16.5" y="3.5" width="2.5" height="5" rx="1" fill="#fff"/></svg>
+      </div>
+    </div>
+    <!-- 灵动岛通知 -->
+    <div id="dynamic-island" aria-hidden="true">
+      <div class="di-icons">
+        <span class="di-i" id="di-ic1"></span>
+        <span class="di-i" id="di-ic2"></span>
+      </div>
+      <div class="di-divider"></div>
+      <div class="di-txt">
+        <div class="di-t1"></div>
+        <div class="di-t2"></div>
+      </div>
+      <div class="di-time">现在</div>
+    </div>
+
+    <div id="app">
+
+      <!-- 1 启动页 -->
+      <div class="screen active" id="screen-splash">
+        <div class="logo"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="14"/><path d="M30 2v10M30 48v10M2 30h10M48 30h10M10 10l7 7M43 43l7 7M50 10l-7 7M17 43l-7 7"/></svg></div>
+        <div class="name">SoundLane</div>
+        <div style="font-size:13px;color:#0a6cff">基于多模态AI的视障人群出行领航助手</div>
+        <div class="slogan">以启明之星，照亮每一步归途</div>
+        <div class="loaddots"><i></i><i></i><i></i></div>
+      </div>
+
+      <!-- 2 首页 -->
+      <div class="screen" id="screen-home">
+        <div class="map-bg">
+          <svg viewBox="0 0 390 900" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="mapBase" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0e9d6"/>
+                <stop offset="50%" stop-color="#ebe2cc"/>
+                <stop offset="100%" stop-color="#e6dcc0"/>
+              </linearGradient>
+              <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#a7d3e2"/>
+                <stop offset="100%" stop-color="#bfe1ec"/>
+              </linearGradient>
+              <linearGradient id="parkG" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#c8e0bb"/>
+                <stop offset="100%" stop-color="#b8d8a7"/>
+              </linearGradient>
+              <linearGradient id="buildingG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ede2c8"/>
+                <stop offset="100%" stop-color="#dccfac"/>
+              </linearGradient>
+              <linearGradient id="mainRd" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff8e6"/>
+                <stop offset="100%" stop-color="#ffeec2"/>
+              </linearGradient>
+            </defs>
+            <rect width="390" height="900" fill="url(#mapBase)"/>
+            <path d="M-20 240 C40 280 30 360 80 410 C120 460 100 540 140 590 C170 630 150 700 100 760 C70 800 110 850 90 920"
+                  fill="none" stroke="url(#waterG)" stroke-width="30" stroke-linecap="round" opacity="1"/>
+            <path d="M-20 240 C40 280 30 360 80 410 C120 460 100 540 140 590 C170 630 150 700 100 760 C70 800 110 850 90 920"
+                  fill="none" stroke="#9ec9da" stroke-width="30" stroke-linecap="round" opacity=".35" transform="translate(2,2)"/>
+            <path d="M22 38 Q72 24 118 42 Q126 78 110 110 Q60 120 28 102 Q12 70 22 38Z" fill="url(#parkG)" opacity=".95"/>
+            <circle cx="80" cy="78" r="3" fill="#7fa66b" opacity=".6"/>
+            <circle cx="50" cy="62" r="2.5" fill="#7fa66b" opacity=".5"/>
+            <circle cx="105" cy="90" r="2" fill="#7fa66b" opacity=".5"/>
+            <path d="M280 558 Q335 550 365 590 Q370 640 340 660 Q290 668 275 632 Q272 590 280 558Z" fill="url(#parkG)" opacity=".95"/>
+            <circle cx="320" cy="600" r="3" fill="#7fa66b" opacity=".6"/>
+            <circle cx="340" cy="630" r="2" fill="#7fa66b" opacity=".5"/>
+            <circle cx="55" cy="820" r="48" fill="url(#parkG)" opacity=".95"/>
+            <circle cx="42" cy="812" r="2.5" fill="#7fa66b" opacity=".5"/>
+            <circle cx="70" cy="832" r="2" fill="#7fa66b" opacity=".5"/>
+            <g fill="url(#buildingG)" opacity=".85">
+              <rect x="130" y="350" width="78" height="50" rx="4"/>
+              <rect x="134" y="354" width="70" height="3" rx="1" fill="#d4c8a8" opacity=".4"/>
+              <rect x="260" y="180" width="58" height="44" rx="4"/>
+              <rect x="40" y="600" width="48" height="38" rx="4"/>
+              <rect x="220" y="320" width="42" height="34" rx="4"/>
+              <rect x="150" y="500" width="38" height="30" rx="4"/>
+              <rect x="200" y="700" width="44" height="36" rx="4"/>
+              <rect x="20" y="180" width="42" height="32" rx="4"/>
+              <rect x="305" y="380" width="38" height="32" rx="4"/>
+              <rect x="100" y="710" width="40" height="30" rx="4"/>
+            </g>
+            <g fill="#000" opacity=".04">
+              <rect x="130" y="350" width="78" height="2" rx="1"/>
+              <rect x="260" y="180" width="58" height="2" rx="1"/>
+              <rect x="40" y="600" width="48" height="2" rx="1"/>
+            </g>
+            <g stroke="#ffffff" stroke-width="5" opacity=".95" stroke-linecap="square">
+              <path d="M0 130H390M0 290H390M0 380H390M0 480H390M0 520H390M0 700H390M0 820H390"/>
+              <path d="M70 0V900M120 0V900M180 0V900M240 0V900M320 0V900"/>
+            </g>
+            <g stroke="#c5b88e" stroke-width="1" opacity=".5">
+              <path d="M0 132H390M0 292H390M0 382H390M0 700H390"/>
+              <path d="M72 0V900M182 0V900M322 0V900"/>
+            </g>
+            <g stroke="url(#mainRd)" stroke-width="13" stroke-linecap="square">
+              <path d="M0 220H390M0 430H390M0 640H390"/>
+              <path d="M250 0V900"/>
+            </g>
+            <g fill="none" stroke="#e0c98a" stroke-width="2" opacity=".4">
+              <path d="M0 220H390M0 430H390M0 640H390M250 0V900"/>
+            </g>
+            <g stroke="#d9b865" stroke-width="1" stroke-dasharray="6 4" opacity=".7">
+              <path d="M0 220H390M0 430H390M0 640H390M250 0V900"/>
+            </g>
+            <g>
+              <circle cx="60" cy="220" r="5" fill="#ff453a"/>
+              <text x="68" y="223" font-size="9" font-weight="700" fill="#c9261c" font-family="-apple-system,sans-serif">医院</text>
+            </g>
+            <g>
+              <circle cx="330" cy="430" r="5" fill="#5e5ce6"/>
+              <text x="295" y="455" font-size="9" font-weight="700" fill="#3a3a99" font-family="-apple-system,sans-serif">学校</text>
+            </g>
+            <g>
+              <circle cx="180" cy="380" r="5" fill="#ff9f0a"/>
+              <text x="190" y="383" font-size="9" font-weight="700" fill="#c46a00" font-family="-apple-system,sans-serif">商场</text>
+            </g>
+            <g>
+              <circle cx="320" cy="700" r="5" fill="#30d158"/>
+              <text x="330" y="703" font-size="9" font-weight="700" fill="#1e7a3a" font-family="-apple-system,sans-serif">公园</text>
+            </g>
+            <circle cx="320" cy="220" r="14" fill="#007aff" opacity=".15">
+              <animate attributeName="r" values="14;36;14" dur="3.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".18;0;.18" dur="3.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="320" cy="220" r="14" fill="#007aff" opacity=".28">
+              <animate attributeName="r" values="14;26;14" dur="3.6s" begin=".4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".28;0;.28" dur="3.6s" begin=".4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="320" cy="220" r="11" fill="#007aff" stroke="#fff" stroke-width="2.5"/>
+            <circle cx="320" cy="220" r="4" fill="#fff"/>
+            <rect x="278" y="186" width="84" height="20" rx="10" fill="rgba(10,78,201,.92)"/>
+            <text x="320" y="200" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" font-family="-apple-system,sans-serif">我在这里</text>
+            <polyline points="320,220 250,220 250,430 200,430 200,640 60,640 60,820" fill="none"
+                      stroke="#007aff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/>
+            <polyline points="320,220 250,220 250,430 200,430 200,640 60,640 60,820" fill="none"
+                      stroke="#fff" stroke-width="1.5" stroke-dasharray="0 8" stroke-linecap="round" opacity=".9">
+              <animate attributeName="stroke-dashoffset" values="0;-16" dur="1.2s" repeatCount="indefinite"/>
+            </polyline>
+            <circle cx="250" cy="220" r="3" fill="#fff" stroke="#007aff" stroke-width="2"/>
+            <circle cx="250" cy="430" r="3" fill="#fff" stroke="#007aff" stroke-width="2"/>
+            <circle cx="200" cy="430" r="3" fill="#fff" stroke="#007aff" stroke-width="2"/>
+            <circle cx="200" cy="640" r="3" fill="#fff" stroke="#007aff" stroke-width="2"/>
+            <circle cx="60" cy="640" r="3" fill="#fff" stroke="#007aff" stroke-width="2"/>
+            <circle cx="60" cy="820" r="36" fill="none" stroke="#c08038" stroke-width="2.5" opacity=".55"/>
+            <circle cx="60" cy="820" r="22" fill="#e8a85a" opacity=".4">
+              <animate attributeName="r" values="22;44;22" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".4;0;.4" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="60" cy="820" r="22" fill="#e8a85a" opacity=".95"/>
+            <path d="M50 815l-6 12h12z" fill="#e11d48"/>
+            <rect x="14" y="868" width="92" height="22" rx="11" fill="rgba(124,74,20,.92)"/>
+            <text x="60" y="883" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="-apple-system,sans-serif">大运中心</text>
+          </svg>
+        </div>
+        <div class="home-content">
+        <div class="topbar">
+          <span>上午 9:41</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="stat-chip"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 2v6l4 2" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>光照充足</span>
+            <button class="sos-mini" onclick="go('sos')">求助</button>
+          </div>
+        </div>
+        <div class="home-top">
+          <h2 class="s">你好，小李</h2>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+            <svg viewBox="0 0 24 24" width="12" height="12" style="stroke:#8e8e93;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 21s-6.5-4.9-6.5-10.3a6.5 6.5 0 1113 0C18.5 16.1 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>
+            <span class="sub" style="font-size:12.5px">深圳市龙岗区 · 大运中心 附近</span>
+          </div>
+        </div>
+
+        <div class="voice-area">
+          <div class="vmic" id="vmic"><span class="halo"></span><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><svg viewBox="0 0 24 24"><path d="M12 15a3.5 3.5 0 003.5-3.5v-5a3.5 3.5 0 10-7 0v5A3.5 3.5 0 0012 15zM5 11a7 7 0 0014 0M12 18v4M9 22h6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="listen-tip" id="listen-tip">说「SoundLane」唤醒我</div>
+        </div>
+
+        <div class="today-card">
+          <div class="today-ring">
+            <div class="ring-in"><div class="ring-v">100</div><div class="ring-l">安全分</div></div>
+          </div>
+          <div class="today-grid">
+            <div class="today-cell"><div class="tv" data-count="2.4 km">2.4 km</div><div class="tl">今日里程</div></div>
+            <div class="today-cell"><div class="tv" data-count="28 min">28 min</div><div class="tl">出行时长</div></div>
+            <div class="today-cell"><div class="tv" data-count="2555">2555</div><div class="tl">步数</div></div>
+            <div class="today-cell"><div class="tv" data-count="3 次">3 次</div><div class="tl">AI 预警提醒</div></div>
+            <div class="hour-label">今日出行时段 <span style="color:#c7c7cc;font-weight:400">· 柱高 = 该时段步行活跃度</span></div>
+            <div class="today-hour">
+              <i style="height:20%" title="06 时"></i><i style="height:14%" title="07 时"></i><i style="height:10%" title="08 时"></i><i style="height:10%" title="09 时"></i><i style="height:14%" title="10 时"></i><i style="height:22%" title="11 时"></i><i style="height:38%" title="12 时"></i><i style="height:62%" title="13 时"></i><i style="height:85%" title="14 时"></i><i style="height:60%" title="15 时"></i><i style="height:38%" title="16 时"></i><i style="height:30%" title="17 时"></i><i style="height:46%" title="18 时"></i><i style="height:72%" title="19 时"></i><i style="height:90%" title="20 时"></i><i style="height:52%" title="21 时"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="grp-title">快捷功能</div>
+          <div class="grp-card">
+            <div class="row" onclick="go('indoor')">
+              <div class="ic" style="background:rgba(0,122,255,.1)"><svg viewBox="0 0 24 24" fill="#007aff"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3.2" fill="#fff"/></svg></div>
+              <div class="t"><div class="n">室内导航</div><div class="d">商场 · 地铁 · 医院 · 无障碍指引</div></div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#c7c7cc"><path d="M9 5l7 7-7 7"/></svg>
+            </div>
+            <div class="row" onclick="go('guardian')">
+              <div class="ic" style="background:rgba(52,199,89,.12)"><svg viewBox="0 0 24 24" fill="#28a745"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="t"><div class="n">家人守护</div><div class="d">妈妈 · 家（300 米）· 异常停留提醒已开启</div></div>
+              <span class="tag">守护中</span>
+            </div>
+            <div class="row">
+              <div class="ic" style="background:rgba(0,122,255,.1)"><svg viewBox="0 0 24 24" fill="#007aff"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3.2" fill="#fff"/></svg></div>
+              <div class="t"><div class="n">回家路线 · 熟悉路况</div><div class="d">已学习 34 次 · 今日无新增障碍</div></div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#c7c7cc"><path d="M9 5l7 7-7 7"/></svg>
+            </div>
+            <div class="row" onclick="connectDevice(this,'Apple Watch','震动领航已开启，转向时轻震提示')">
+              <div class="ic" style="background:rgba(120,120,128,.12)"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#8e8e93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/><path d="M12 10v2l1 1"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/></svg></div>
+              <div class="t"><div class="n">Apple Watch</div><div class="d">震动领航可用 · 转向轻震提示</div></div>
+              <span class="tag">已连接</span>
+            </div>
+            <div class="row" onclick="connectDevice(this,'Apple AirPods Pro','空间音频领航已开启，立体声转向提示')">
+              <div class="ic" style="background:rgba(0,122,255,.1)"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="#0a6cff"><path d="M9.2 2.8c-2.6 0-4.2 1.7-4.2 3.9v10.9a1.4 1.4 0 002.8 0v-5.3c.7.2 1.4.3 1.4.3 2.6 0 4.2-1.7 4.2-3.9s-1.6-5.9-4.2-5.9z"/><path d="M14.8 2.8c2.6 0 4.2 1.7 4.2 3.9v10.9a1.4 1.4 0 01-2.8 0v-5.3c-.7.2-1.4.3-1.4.3-2.6 0-4.2-1.7-4.2-3.9s1.6-5.9 4.2-5.9z"/></svg></div>
+              <div class="t"><div class="n">Apple AirPods</div><div class="d">空间音频领航 · 立体声转向提示</div></div>
+              <span class="tag" style="background:rgba(120,120,128,.12);color:#8e8e93">未连接</span>
+            </div>
+          </div>
+        </div>
+        </div>
+        <button class="collapse-btn" id="collapse-btn" aria-label="收起或展开出行板块" title="收起板块，查看地图">
+          <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
+        </button>
+      </div>
+
+      <!-- 3 目的地选择 -->
+      <div class="screen" id="screen-nav-select">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">出行导航</div><div class="nav-r"><span class="chip" onclick="voiceDest()">语音输入</span></div></div>
+        <!-- 1) 搜索栏 -->
+        <div class="searchbar">
+          <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="6.5" fill="none" stroke="#6e6e73" stroke-width="2"/><path d="M16 16l5 5" stroke="#6e6e73" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" id="dest-input" placeholder="说或输入目的地，如：地铁站">
+          <div class="mic" onclick="voiceDest()"><svg viewBox="0 0 24 24"><path d="M12 15a3.5 3.5 0 003.5-3.5v-5a3.5 3.5 0 10-7 0v5A3.5 3.5 0 0012 15zM5 11a7 7 0 0014 0" fill="none" stroke="#ffd60a" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <!-- 2) 出行偏好 -->
+        <div class="pref-block">
+          <div class="sub" style="margin-bottom:8px">出行偏好</div>
+          <div class="seg" id="pref-seg">
+            <button class="on" onclick="setPref(this)">盲道友好</button>
+            <button onclick="setPref(this)">最短</button>
+            <button onclick="setPref(this)">避障</button>
+          </div>
+        </div>
+        <!-- 3) 常用目的地（这一段内部可上下滚动，整页不滚动） -->
+        <div class="dest-scroll">
+          <div class="sub dest-title">常用目的地</div>
+          <div class="dest-item sel" onclick="pickDest(this)" data-dest="大运中心体育馆" data-sub="大运中心 · 1.0 公里">
+            <div class="di" style="background:#e8a85a"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="none" stroke="#fff" stroke-width="1.6"/></svg></div>
+            <div><div class="dn">大运中心体育馆</div><div class="dd">大运中心 · 1.0 公里 · 无障碍入口</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="回家" data-sub="大运花园 · 2.3 公里">
+            <div class="di" style="background:#ff9f0a"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-5v-6h-4v6H5a1 1 0 01-1-1v-9z"/></svg></div>
+            <div><div class="dn">回家</div><div class="dd">大运花园 · 2.3 公里</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="大运地铁站" data-sub="大运站（3 号线）· 1.2 公里">
+            <div class="di" style="background:#0a84ff"><svg viewBox="0 0 24 24" fill="#fff"><path d="M5 7c0-2.8 3.1-4 7-4s7 1.2 7 4v9a2 2 0 01-2 2l1.5 2h-3l-1.5-2h-4L8.5 20h-3L7 18a2 2 0 01-2-2V7z"/><circle cx="9" cy="11" r="1.3" fill="#0a84ff"/><circle cx="15" cy="11" r="1.3" fill="#0a84ff"/></svg></div>
+            <div><div class="dn">大运地铁站</div><div class="dd">大运站（3 号线）· 1.2 公里</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="龙城医院" data-sub="龙翔大道 99 号 · 4.1 公里">
+            <div class="di" style="background:#ff453a"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-7-5.3-7-11a7 7 0 0114 0c0 5.7-7 11-7 11zm-3-9h2v-2h2v2h2v2h-2v2h-2v-2H9v-2z"/></svg></div>
+            <div><div class="dn">龙城医院</div><div class="dd">龙翔大道 99 号 · 4.1 公里</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="星河时代广场" data-sub="黄阁路与龙翔大道交叉口 · 0.8 公里">
+            <div class="di" style="background:#5e5ce6"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 21V10l8-6 8 6v11h-6v-7h-4v7H4z"/></svg></div>
+            <div><div class="dn">星河时代广场</div><div class="dd">黄阁路与龙翔大道交叉口 · 0.8 公里</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="公司" data-sub="大运软件小镇 · 3.2 公里">
+            <div class="di" style="background:#30d158"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 21V8l9-5 9 5v13h-6v-7H9v7H3z"/></svg></div>
+            <div><div class="dn">公司</div><div class="dd">大运软件小镇 · 3.2 公里</div></div>
+          </div>
+          <div class="dest-item" onclick="pickDest(this)" data-dest="公园" data-sub="龙城公园 · 1.5 公里">
+            <div class="di" style="background:#ff2d92"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C8 6 6 9 6 12a6 6 0 0012 0c0-3-2-6-6-10z"/></svg></div>
+            <div><div class="dn">龙城公园</div><div class="dd">龙城公园 · 1.5 公里</div></div>
+          </div>
+        </div>
+        <!-- 4) 开始规划路线（固定在底栏上方，整页不可滚动 → 这个按钮永远可见） -->
+        <div class="plan-cta">
+          <button class="btn primary" onclick="planRoute()"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3"/></svg>开始规划路线</button>
+        </div>
+      </div>
+
+      <!-- 4 路线概览 -->
+      <div class="screen" id="screen-nav-route">
+        <div class="nav"><div class="back" onclick="go('nav-select')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">路线概览</div><div class="nav-r"><span class="chip" id="route-pref-chip">盲道友好</span></div></div>
+        <div class="card">
+          <div class="route-meta">
+            <div class="m"><b>1.2</b> 公里</div>
+            <div class="m"><b>18</b> 分钟</div>
+            <div class="m">步行</div>
+          </div>
+          <div style="margin-top:12px;font-size:15px;font-weight:700" id="route-dest-title">到 大运中心体育馆</div>
+          <div class="sub" style="margin-top:2px">途经：黄阁路 → 大运路</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#0a6cff"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>分段指引</div>
+          <div class="step"><div class="line"><div class="dot"></div><div class="bar"></div></div><div class="txt">沿<b>黄阁路</b>直行 <b>400 米</b></div></div>
+          <div class="step"><div class="line"><div class="dot"></div><div class="bar"></div></div><div class="txt">右转进入<b>大运路</b>，直行 <b>350 米</b></div></div>
+          <div class="step"><div class="line"><div class="dot"></div><div class="bar"></div></div><div class="txt">直行 <b>300 米</b>，途经人行天桥（有坡道）</div></div>
+          <div class="step"><div class="line"><div class="dot" style="background:#30d158"></div><div class="bar" style="display:none"></div></div><div class="txt">左转到达<b>大运中心体育馆</b>（无障碍入口）</div></div>
+        </div>
+        <div class="card" style="border-left:3px solid #ff9f0a">
+          <div class="sub" style="color:#0a6cff">途中无障碍提示</div>
+          <div style="font-size:13.5px;margin-top:6px;line-height:1.6">途经 <b style="color:#ff9f0a">1 处盲道中断</b>（社区已标记，将提前语音提醒）<br>大运中心体育馆有 <b style="color:#30d158">无障碍电梯</b> 与 无障碍卫生间</div>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn primary" onclick="startNav()"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3"/></svg>开始导航（语音播报）</button>
+      </div>
+
+      <!-- 5 实时导航 -->
+      <div class="screen" id="screen-nav-live">
+        <div class="alert" id="obstacle-alert">
+          <div class="ai"><svg viewBox="0 0 24 24"><path d="M12 3L1.5 20h21L12 3z"/><path d="M12 10v4.5M12 17.5v.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+          <div class="at">
+            <div class="l1">高风险 · 前方 2 米有台阶</div>
+            <div class="l2">请放缓脚步，注意脚下 · 已震动提醒</div>
+            <div class="l3">系统已暂停导航播报，等待您的确认</div>
+          </div>
+        </div>
+        <div class="arrive-card" id="arrive-card">
+          <div class="inner">
+            <div class="ok"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+            <div style="font-size:19px;font-weight:800">已到达目的地附近</div>
+            <div class="sub" style="margin-top:6px">大运中心体育馆 · 无障碍入口在您右侧 8 米</div>
+            <div class="sub" style="margin-top:2px">本次行程 1.0 公里 · 用时 15 分钟</div>
+            <button class="btn primary" style="margin-top:16px" onclick="go('home')">完成</button>
+          </div>
+        </div>
+        <div class="live-wrap">
+          <div class="live-head">
+            <span id="live-dest">到 大运中心体育馆</span>
+            <span id="live-rest">剩余 1.0 公里 · 15 分钟</span>
+          </div>
+          <div class="progress"><i id="live-progress"></i></div>
+          <div class="nav-banner">
+            <div class="mini-arrow" id="big-arrow"><svg viewBox="0 0 64 64"><path d="M32 8l16 20h-9v22H25V28h-9L32 8z"/></svg></div>
+            <div class="nb-d">
+              <div class="nb-dist" id="live-dist">200<small> 米</small></div>
+              <div class="nb-next" id="live-next"><b>直行</b> 前方 50 米右转 · 大运路</div>
+            </div>
+          </div>
+          <div class="live-cam" id="live-cam">
+            <!-- 三段实拍视频，按序切换 -->
+            <video id="demo-v1" class="demo-video active" src="assets/demo/1.mp4" playsinline muted preload="auto"></video>
+            <video id="demo-v2" class="demo-video" src="assets/demo/2.mp4" playsinline muted preload="auto"></video>
+            <video id="demo-v3" class="demo-video" src="assets/demo/3.mp4" playsinline muted preload="auto"></video>
+            <canvas id="nav-canvas"></canvas>
+            <!-- AI 检测框：视频1 远景楼梯 -->
+            <div class="det-box det-step1" id="det-step1" data-on="v1">
+              <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+              <span class="det-label">台阶 · 30 m</span>
+              <i class="scanline"></i>
+            </div>
+            <!-- AI 检测框：视频2 楼梯（爬梯时） -->
+            <div class="det-box det-step2" id="det-step2" data-on="v2">
+              <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+              <span class="det-label">台阶 · 共 5 节</span>
+              <i class="scanline"></i>
+            </div>
+            <!-- AI 检测框：视频3 灯杆（左侧） -->
+            <div class="det-box det-lamp" id="det-lamp" data-on="v3">
+              <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+              <span class="det-label">灯杆 · 左侧 2 m</span>
+              <i class="scanline"></i>
+            </div>
+            <!-- 震动提示图标（界面模拟） -->
+            <div class="vibe-icon" id="vibe-icon">
+              <svg viewBox="0 0 24 24"><path d="M2 12h2M5 8v8M9 4v16M13 8v8M17 5v14M21 9v6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>
+              <span>震动提醒</span>
+            </div>
+            <!-- 当前阶段提示（左上） -->
+            <div class="demo-stage" id="demo-stage">阶段 1/3 · 走向楼梯</div>
+            <div class="live-caption" id="nav-caption">正在为您领航，请保持前行…</div>
+          </div>
+          <div class="busbar" id="busbar">
+            <div class="bi"><svg viewBox="0 0 24 24"><path d="M5 7c0-2.8 3.1-4 7-4s7 1.2 7 4v9a2 2 0 01-2 2l1.5 2h-3l-1.5-2h-4L8.5 20h-3L7 18a2 2 0 01-2-2V7z"/></svg></div>
+            <div class="bt"><div class="l1">M220 路公交 · 3 分钟后到站</div><div class="l2">大运站 · 无障碍通道可用</div></div>
+          </div>
+          <div class="spatial" style="margin-top:8px">
+            <div class="ear" id="ear-l">L</div>
+            <div class="mid" id="spatial-mid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="ear" id="ear-r">R</div>
+          </div>
+          <div style="text-align:center;font-size:11px;color:#7a8699">空间音频领航 · 左耳轻响=左转 / 右耳轻响=右转</div>
+          <div class="live-btns">
+            <button class="btn dark" onclick="repeatStep()">播报详情</button>
+            <button class="btn dark" id="pause-btn" onclick="togglePause()">暂停</button>
+            <button class="btn danger" onclick="stopNav()">结束</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 避障感知 -->
+      <div class="screen" id="screen-sense">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">避障感知</div><div class="nav-r"><span class="chip" onclick="go('cobuild')">标记障碍</span></div></div>
+        <div class="cam" id="cam">
+          <video id="cam-video" autoplay playsinline muted></video>
+          <canvas id="sense-canvas"></canvas>
+          <div class="cam-chips"><span class="cc cc-ai">AI 感知 · 就绪</span><span class="cc">本地处理 · 0 上传</span></div>
+          <div class="scene" id="cam-scene">
+            <!-- 天空层：渐变 + 太阳 + 云朵 -->
+            <div class="sky"></div>
+            <div class="sun"></div>
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div class="cloud c3"></div>
+            <!-- 远景：山影 + 远树 -->
+            <div class="mountain m1"></div>
+            <div class="mountain m2"></div>
+            <div class="tree-far tf1"></div>
+            <div class="tree-far tf2"></div>
+            <div class="tree-far tf3"></div>
+            <!-- 建筑群：3栋带阴影/窗户/屋顶 -->
+            <div class="bld b1">
+              <div class="roof"></div>
+              <div class="facade"></div>
+              <div class="win-grid"></div>
+              <div class="sign"></div>
+            </div>
+            <div class="bld b2">
+              <div class="roof"></div>
+              <div class="facade"></div>
+              <div class="win-grid"></div>
+            </div>
+            <div class="bld b3">
+              <div class="roof"></div>
+              <div class="facade"></div>
+              <div class="win-grid"></div>
+              <div class="awning"></div>
+            </div>
+            <!-- 路灯 -->
+            <div class="lamp"><div class="pole"></div><div class="arm"></div><div class="head"></div><div class="glow"></div></div>
+            <!-- 地面 + 人行道 + 盲道 + 道路 + 斑马线 -->
+            <div class="ground"></div>
+            <div class="sidewalk"></div>
+            <div class="tactile"></div>
+            <div class="road"></div>
+            <div class="lane-line"></div>
+            <div class="crosswalk"></div>
+            <!-- 障碍物 1：三层台阶（高风险） -->
+            <div class="obj-step">
+              <div class="step s3"></div><div class="step s2"></div><div class="step s1"></div>
+              <div class="shadow"></div>
+            </div>
+            <!-- 障碍物 2：水坑（中风险） -->
+            <div class="obj-puddle">
+              <div class="water"></div>
+              <div class="ripple r1"></div>
+              <div class="ripple r2"></div>
+            </div>
+            <!-- 障碍物 3：完整行人（低风险） -->
+            <div class="obj-person">
+              <div class="head"></div>
+              <div class="body"></div>
+              <div class="arm a1"></div>
+              <div class="arm a2"></div>
+              <div class="leg l1"></div>
+              <div class="leg l2"></div>
+              <div class="bag"></div>
+              <div class="shadow"></div>
+            </div>
+            <!-- 障碍物 4：悬空斜伸树枝（高风险） -->
+            <div class="obj-hang">
+              <div class="branch"></div>
+              <div class="leaves l1"></div>
+              <div class="leaves l2"></div>
+              <div class="leaves l3"></div>
+              <div class="shadow"></div>
+            </div>
+          </div>
+          <div class="dbox hi" style="left:4%;top:46%;width:74px;height:44px"><span class="dl">台阶 · 高风险</span><span class="dr">1.2 m</span></div>
+          <div class="dbox mid" style="right:14%;bottom:18%;width:84px;height:34px"><span class="dl">水坑 · 中风险</span><span class="dr">0.8 m</span></div>
+          <div class="dbox lo" style="left:50%;top:30%;width:64px;height:88px"><span class="dl">行人</span><span class="dr">2.5 m</span></div>
+          <div class="dbox hi" style="right:2%;top:32%;width:82px;height:56px"><span class="dl">悬空障碍 · 高风险</span><span class="dr">1.5 m</span></div>
+        </div>
+        <div class="sense-stats">
+          <div class="s"><div class="v" data-count="4">4</div><div class="k">当前目标</div></div>
+          <div class="s"><div class="v" data-count="20+">20+</div><div class="k">可识别类别</div></div>
+          <div class="s"><div class="v" data-count="93.8%">93.8%</div><div class="k">识别准确率</div></div>
+          <div class="s"><div class="v" data-count="0">0</div><div class="k">数据上传</div></div>
+        </div>
+        <div class="live-btns">
+          <button class="btn primary" onclick="senseSpeak()"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 11v2"/></svg>立即播报</button>
+          <button class="btn dark" onclick="switchCamMode()">切换视角</button>
+        </div>
+        <div class="card">
+          <div class="sub" style="line-height:1.7">识别在<b style="color:#30d158">本地完成</b>，影像与位置数据不离开手机，全程隐私安全。<br>识别结果按「距离 + 方位 + 风险等级」分层语义播报。</div>
+        </div>
+      </div>
+
+      <!-- 7 室内导航 -->
+      <div class="screen" id="screen-indoor">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">室内导航 · 大运中心体育馆</div><div class="nav-r"><span class="chip">空间音频</span></div></div>
+        <div class="floors">
+          <div class="f on" onclick="setFloor(this,'B1 层')">B1 层</div>
+          <div class="f" onclick="setFloor(this,'1F 层')">1F 层</div>
+          <div class="f" onclick="setFloor(this,'2F 层')">2F 层</div>
+        </div>
+        <div class="mapwrap">
+          <svg viewBox="0 0 340 380">
+            <rect x="0" y="0" width="340" height="380" fill="#eef4fb"/>
+            <rect x="10" y="10" width="320" height="360" fill="#fff" stroke="#d5dce6" stroke-width="2"/>
+            <rect x="30" y="30" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="75" y="62" fill="#6b7a8f" font-size="11" text-anchor="middle">便利店</text>
+            <rect x="30" y="116" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="75" y="148" fill="#6b7a8f" font-size="11" text-anchor="middle">奶茶店</text>
+            <rect x="220" y="30" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="265" y="62" fill="#6b7a8f" font-size="11" text-anchor="middle">服装店</text>
+            <rect x="220" y="116" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="265" y="148" fill="#6b7a8f" font-size="11" text-anchor="middle">快餐店</text>
+            <rect x="30" y="250" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="75" y="282" fill="#6b7a8f" font-size="11" text-anchor="middle">书店</text>
+            <rect x="220" y="250" width="90" height="70" fill="#f3f6fb" stroke="#d5dce6"/><text x="265" y="282" fill="#6b7a8f" font-size="11" text-anchor="middle">餐饮区</text>
+            <rect x="130" y="210" width="80" height="50" fill="#e8f0ff" stroke="#0a6cff" stroke-width="1.5"/><text x="170" y="238" fill="#0a6cff" font-size="11" text-anchor="middle">服务台</text>
+            <rect x="290" y="40" width="36" height="36" rx="6" fill="#0a84ff"/><text x="308" y="62" fill="#fff" font-size="10" text-anchor="middle">电梯</text>
+            <rect x="14" y="40" width="36" height="36" rx="6" fill="#30d158"/><text x="32" y="62" fill="#fff" font-size="10" text-anchor="middle">出口</text>
+            <rect x="290" y="310" width="36" height="36" rx="6" fill="#ff9f0a"/><text x="308" y="332" fill="#fff" font-size="10" text-anchor="middle">卫生间</text>
+            <polyline id="route-line" points="" fill="none" stroke="#0a6cff" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round" style="display:none"/>
+            <circle cx="170" cy="340" r="10" fill="#0a84ff" opacity=".35"><animate attributeName="r" values="8;16;8" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="170" cy="340" r="6" fill="#0a84ff"/>
+          </svg>
+        </div>
+        <div class="card" id="indoor-info">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#0a84ff"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3.2" fill="#fff"/></svg>当前位置 · B1 层</div>
+          <div class="sub" id="indoor-tip">轻点上方目的地（电梯 / 出口 / 卫生间 / 服务台），SoundLane为您领航</div>
+        </div>
+      </div>
+
+      <!-- 8 守护 -->
+      <div class="screen" id="screen-guardian">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">家人守护</div><div class="nav-r"><span class="chip" onclick="go('sos')">一键求助</span></div></div>
+
+        <!-- 守护总览：玻璃感横幅 -->
+        <div class="guard-hero">
+          <div class="gh-left">
+            <div class="gh-avatars">
+              <div class="gh-av" style="background:linear-gradient(135deg,#ffb86b,#ff9f0a)">妈</div>
+              <div class="gh-av" style="background:linear-gradient(135deg,#5fa8ff,#0a84ff)">爸</div>
+            </div>
+            <div>
+              <div class="gh-title">守护 2 位家人</div>
+              <div class="gh-sub">2 人在线 · 全部位置已共享</div>
+            </div>
+          </div>
+          <div class="gh-pulse" aria-hidden="true">
+            <span class="gh-dot"></span>
+            <span class="gh-dot"></span>
+            <span class="gh-dot"></span>
+          </div>
+        </div>
+
+        <!-- 家人列表 -->
+        <div class="guard-family">
+          <div class="gf-title">家人 · 实时状态</div>
+
+          <div class="fam-card">
+            <div class="fam-l">
+              <div class="fam-av" style="background:linear-gradient(135deg,#ffb86b,#ff9f0a)">
+                <span>妈</span>
+                <i class="fam-on"></i>
+              </div>
+              <div class="fam-info">
+                <div class="fam-name">妈妈 · 张慧 <span class="fam-tag">主要联系人</span></div>
+                <div class="fam-loc"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-4.9-6.5-10.3a6.5 6.5 0 1113 0C18.5 16.1 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>家 · 距离您 300 米</div>
+                <div class="fam-time">刚刚在线 · 步数 1,820</div>
+              </div>
+            </div>
+            <div class="fam-r">
+              <button class="fam-call" title="语音通话"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.86 19.86 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.86 19.86 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></button>
+              <button class="fam-more" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+            </div>
+          </div>
+
+          <div class="fam-card">
+            <div class="fam-l">
+              <div class="fam-av" style="background:linear-gradient(135deg,#5fa8ff,#0a84ff)">
+                <span>爸</span>
+                <i class="fam-on"></i>
+              </div>
+              <div class="fam-info">
+                <div class="fam-name">爸爸 · 李建国</div>
+                <div class="fam-loc"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-4.9-6.5-10.3a6.5 6.5 0 1113 0C18.5 16.1 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>公司 · 距离您 2.1 公里</div>
+                <div class="fam-time">5 分钟前在线 · 步数 642</div>
+              </div>
+            </div>
+            <div class="fam-r">
+              <button class="fam-call" title="语音通话"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.86 19.86 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.86 19.86 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></button>
+              <button class="fam-more" title="更多"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 守护设置：异常停留 -->
+        <div class="guard-card">
+          <div class="guard-row">
+            <div class="gr-ic" style="background:linear-gradient(135deg,rgba(255,159,10,.22),rgba(255,159,10,.08))"><svg viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.86 1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+            <div class="gr-t"><div class="gr-n">异常停留提醒</div><div class="gr-d">若 15 分钟未移动，自动通知家人</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="guard-divider"></div>
+          <div class="guard-row">
+            <div class="gr-ic" style="background:linear-gradient(135deg,rgba(10,132,255,.22),rgba(10,132,255,.08))"><svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="gr-t"><div class="gr-n">位置共享</div><div class="gr-d">实时同步给 2 位家人</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <!-- 我的位置 -->
+        <div class="guard-card">
+          <div class="guard-head">
+            <div class="card-title"><svg viewBox="0 0 24 24" fill="#30d158"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>我的位置</div>
+            <span class="gh-pill">已共享</span>
+          </div>
+          <div class="guard-map">
+            <div class="gm-grid"></div>
+            <div class="gm-route"></div>
+            <div class="gm-me"><span class="gm-pulse"></span><i></i></div>
+            <div class="gm-mom"></div>
+            <div class="gm-dad"></div>
+            <div class="gm-tag-me">我</div>
+            <div class="gm-tag-mom">妈</div>
+            <div class="gm-tag-dad">爸</div>
+          </div>
+          <div class="guard-loc-row">
+            <div class="glr-l">
+              <div class="glr-t">大运中心体育馆</div>
+              <div class="glr-d">已共享给 2 位家人</div>
+            </div>
+            <button class="btn dark" style="height:36px;font-size:13px;padding:0 14px" onclick="remoteHelp()">远程协助</button>
+          </div>
+        </div>
+
+        <!-- 守护记录 -->
+        <div class="guard-card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#5e5ce6"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm.5 5h-1.5v6l5 3 .8-1.3-4.3-2.6V7z"/></svg>守护记录</div>
+          <div class="guard-log">
+            <div class="glog-item">
+              <i class="glog-dot" style="background:#30d158"></i>
+              <div class="glog-l">
+                <div class="glog-t">妈妈安全到家</div>
+                <div class="glog-d">今天 18:42 · 步行 1.2 公里</div>
+              </div>
+            </div>
+            <div class="glog-item">
+              <i class="glog-dot" style="background:#0a84ff"></i>
+              <div class="glog-l">
+                <div class="glog-t">位置同步成功</div>
+                <div class="glog-d">今天 17:30 · 2 位家人查看</div>
+              </div>
+            </div>
+            <div class="glog-item">
+              <i class="glog-dot" style="background:#ff9f0a"></i>
+              <div class="glog-l">
+                <div class="glog-t">妈妈停留超 15 分钟</div>
+                <div class="glog-d">今天 12:18 · 已自动通知</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 求助联动说明 -->
+        <div class="guard-tip">
+          <span class="gt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
+          <span>一键求助时，家人将收到<b style="color:#ff453a">实时位置 + 语音场景</b>，并可开启「远程领航」陪伴您走到安全地点。</span>
+        </div>
+      </div>
+
+      <!-- 9 一键求助 -->
+      <div class="screen" id="screen-sos">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">一键求助</div></div>
+        <div class="fam">
+          <div class="av" style="background:#ff9f0a">妈</div>
+          <div class="fi"><div class="n">妈妈 · 张慧</div><div class="d">家人 · 默认联系人</div></div>
+        </div>
+        <div class="fam">
+          <div class="av" style="background:#5e5ce6">红</div>
+          <div class="fi"><div class="n">志愿者 · 李红</div><div class="d">残联志愿者 · 附近 400 米</div></div>
+        </div>
+        <div class="sos-btn" id="sos-btn" onclick="sosGo()">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.5 5h3v8h-3V7zm0 10h3v3h-3v-3z"/></svg>
+          <span id="sos-label">一键求助</span>
+        </div>
+        <div class="sub" style="text-align:center">按下后向联系人与家人发送位置，并自动拨打紧急电话</div>
+        <div class="sos-ok" id="sos-ok">
+          <div class="l1">求助已发出</div>
+          <div class="l2">已通知 2 位联系人 · 已拨打 120 紧急电话（演示）</div>
+          <div class="l2">位置已发送：深圳市龙岗区 · 大运中心体育馆（22.6893, 114.2154）</div>
+        </div>
+        <div>
+          <div class="sub" style="margin-bottom:8px">紧急呼叫</div>
+          <div class="quickcall">
+            <button onclick="speak('正在为您呼叫 110 报警电话，请保持通话')">110</button>
+            <button onclick="speak('正在为您呼叫 119 火警电话，请保持通话')">119</button>
+            <button onclick="speak('正在为您呼叫 120 急救电话，请保持通话')">120</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 无障碍共建 -->
+      <div class="screen" id="screen-cobuild">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">无障碍共建地图</div><div class="nav-r"><span class="chip">328 条标注</span></div></div>
+        <div class="mapmini">
+          <svg viewBox="0 0 340 150">
+            <rect width="340" height="150" fill="#eef3fa"/>
+            <path d="M0 40H340M0 100H340M60 0V150M200 0V150" stroke="#d7e0ec" stroke-width="2"/>
+            <path d="M0 70H340" stroke="#dfe7f2" stroke-width="1"/>
+            <path d="M120 0V150" stroke="#dfe7f2" stroke-width="1"/>
+            <path d="M280 0V150" stroke="#dfe7f2" stroke-width="1"/>
+            <path d="M0 25H340" stroke="#dfe7f2" stroke-width="1"/>
+            <path d="M0 115H340" stroke="#dfe7f2" stroke-width="1"/>
+          </svg>
+          <div class="mk" style="left:22%;top:30%" title="盲道中断"><svg viewBox="0 0 24 24" fill="#ff453a"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.5 5h3v8h-3V7zm0 10h3v3h-3v-3z"/></svg><span style="color:#ff453a">盲道中断</span></div>
+          <div class="mk" style="left:55%;top:68%" title="坡道"><svg viewBox="0 0 24 24" fill="#30d158"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><path d="M10 16v-3h4v3h3v-4l-5-3.5L7 12v4h3z"/></svg><span style="color:#30d158">坡道</span></div>
+          <div class="mk" style="left:78%;top:22%" title="无障碍卫生间"><svg viewBox="0 0 24 24" fill="#0a84ff"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9v-3a5 5 0 0114 0v3H5z"/></svg><span style="color:#0a84ff">无障碍卫生间</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#5e5ce6"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.5 6.4 19.5l1.1-6.3L3 8.9 9 8l3-6z"/></svg>提交新标注</div>
+          <div class="sub" style="margin-bottom:8px">选择类型</div>
+          <div class="cotype" id="cotype">
+            <button class="on" onclick="setCoType(this,'盲道损坏')">盲道损坏</button>
+            <button onclick="setCoType(this,'坡道')">坡道</button>
+            <button onclick="setCoType(this,'障碍物')">障碍物</button>
+            <button onclick="setCoType(this,'无障碍设施')">无障碍设施</button>
+          </div>
+          <div class="sub" style="margin:10px 0 8px">位置</div>
+          <div class="searchbar" style="margin-bottom:12px">
+            <svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="6.5" fill="none" stroke="#6e6e73" stroke-width="2"/><path d="M16 16l5 5" stroke="#6e6e73" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="co-loc" placeholder="如：大运中心体育馆南门">
+          </div>
+          <button class="btn primary" onclick="submitCo()">提交标注 · 为出行者点亮道路</button>
+        </div>
+      </div>
+
+      <!-- 11 语音设置 -->
+      <div class="screen" id="screen-settings">
+        <div class="nav"><div class="back" onclick="go('profile')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">语音设置</div></div>
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#0a6cff"><path d="M12 15a3.5 3.5 0 003.5-3.5v-5a3.5 3.5 0 10-7 0v5A3.5 3.5 0 0012 15zM5 11a7 7 0 0014 0" fill="none" stroke="#0a6cff" stroke-width="2" stroke-linecap="round"/></svg>播报频次</div>
+          <div class="seg" id="freq-seg">
+            <button onclick="setFreq(this,'频繁')">频繁</button>
+            <button class="on" onclick="setFreq(this,'标准')">标准</button>
+            <button onclick="setFreq(this,'精简')">精简</button>
+          </div>
+          <div class="sub" id="freq-desc" style="margin-top:8px">标准：关键转向 + 障碍提示，避免信息过载</div>
+        </div>
+        <div class="card">
+          <div class="row" style="padding-top:2px">
+            <div class="ic" style="background:#0a84ff"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><circle cx="12" cy="11" r="3.2" fill="#0a84ff"/></svg></div>
+            <div class="t"><div class="n">空间音频领航</div><div class="d">转向 / 障碍用方向性声场提示</div></div>
+            <div class="toggle on" id="spatial-toggle" onclick="toggleSpatial(this)"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="#30d158"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>语音参数</div>
+          <div class="slider-row"><span class="sub" style="width:38px">语速</span><input type="range" min="0.8" max="1.2" step="0.05" value="1" oninput="state.speed=+this.value;nextSibling.textContent=this.value.toFixed(2)"><span class="val" id="speed-val">1.00</span></div>
+          <div class="slider-row"><span class="sub" style="width:38px">音调</span><input type="range" min="0.8" max="1.3" step="0.05" value="1" oninput="state.pitch=+this.value;nextSibling.textContent=this.value.toFixed(2)"><span class="val" id="pitch-val">1.00</span></div>
+        </div>
+        <div class="card">
+          <div class="row" style="padding-top:2px">
+            <div class="ic" style="background:#ff9f0a"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1 15h-2v-7h2v7zm4 0h-2v-7h2v7z"/></svg></div>
+            <div class="t"><div class="n">震动等级</div><div class="d">轻震=路径偏移 · 强震=紧急危险</div></div>
+          </div>
+          <div class="seg" id="vib-seg" style="margin-top:8px">
+            <button onclick="setVib(this,'关闭')">关闭</button>
+            <button onclick="setVib(this,'轻')">轻</button>
+            <button class="on" onclick="setVib(this,'强')">强</button>
+          </div>
+        </div>
+        <button class="btn primary" onclick="speak('这是SoundLane的语音播报演示。当前为标准播报频次，空间音频已开启。祝您出行愉快！')"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 11v2"/></svg>试听播报</button>
+      </div>
+
+      <!-- 12 我的 -->
+      <div class="screen" id="screen-profile">
+        <div class="nav"><div class="back" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></div><div class="title">我的</div></div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="avatar">李</div>
+          <div style="min-width:0"><div style="font-size:19px;font-weight:800">小李</div><div class="sub" style="margin-top:3px">低视力用户 · 无障碍倡导者</div></div>
+          <span class="tag" style="margin-left:auto;white-space:nowrap;flex:none">已实名认证</span>
+        </div>
+        <div class="sense-stats">
+          <div class="s"><div class="v" data-count="12">12</div><div class="k">本周出行</div></div>
+          <div class="s"><div class="v" data-count="86">86</div><div class="k">累计公里</div></div>
+          <div class="s"><div class="v" data-count="30">30</div><div class="k">安全出行天数</div></div>
+        </div>
+        <div class="profile-list">
+          <div class="row" onclick="go('settings')"><div class="ic" style="background:#0a6cff"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 15a3.5 3.5 0 003.5-3.5v-5a3.5 3.5 0 10-7 0v5A3.5 3.5 0 0012 15zM5 11a7 7 0 0014 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div><div class="t"><div class="n">语音设置</div><div class="d">播报频次 · 空间音频 · 震动</div></div><span class="chev">›</span></div>
+          <div class="row"><div class="ic" style="background:#0a84ff"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><circle cx="12" cy="12" r="4" fill="#0a84ff"/></svg></div><div class="t"><div class="n">无障碍适配</div><div class="d">字体 · 对比度 · 旁白适配</div></div><span class="chev">›</span></div>
+          <div class="row" onclick="go('cobuild')"><div class="ic" style="background:#5e5ce6"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.5 6.4 19.5l1.1-6.3L3 8.9 9 8l3-6z"/></svg></div><div class="t"><div class="n">无障碍共建</div><div class="d">我的贡献 12 条 · 社区 328 条</div></div><span class="chev">›</span></div>
+          <div class="row"><div class="ic" style="background:#30d158"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 5h-2v7l6 3.5 1-1.7-5-3V7z"/></svg></div><div class="t"><div class="n">使用帮助</div><div class="d">语音操作教程 · 常见问题</div></div><span class="chev">›</span></div>
+          <div class="row"><div class="ic" style="background:#ff9f0a"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.5 6.4 19.5l1.1-6.3L3 8.9 9 8l3-6z"/></svg></div><div class="t"><div class="n">关于SoundLane</div><div class="d">v1.0.0 · 隐私本地化处理</div></div><span class="chev">›</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 标签栏 -->
+    <div id="tabbar">
+      <div class="tab on" data-tab="home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3.5 10.5L12 3l8.5 7.5V20a1 1 0 01-1 1h-5v-6h-5v6h-5a1 1 0 01-1-1v-9.5z"/></svg><span>首页</span></div>
+      <div class="tab" data-tab="nav-select" onclick="go('nav-select')"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-4.9-6.5-10.3a6.5 6.5 0 1113 0C18.5 16.1 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg><span>出行</span></div>
+      <div class="tab" data-tab="sense" onclick="go('sense')"><svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></svg><span>感知</span></div>
+      <div class="tab" data-tab="guardian" onclick="go('guardian')"><svg viewBox="0 0 24 24"><path d="M12 3l7 2.6V11c0 4.5-3 8-7 9.4C8 19 5 15.5 5 11V5.6L12 3z"/><path d="M9.2 11.6l2 2 3.6-4"/></svg><span>守护</span></div>
+      <div class="tab" data-tab="profile" onclick="go('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c.9-3.4 3.9-5 7.5-5s6.6 1.6 7.5 5"/></svg><span>我的</span></div>
+    </div>
+    <div id="homeindicator"></div>
+  </div>
+</div>
+
+<style>
+.mk{position:absolute;transform:translate(-50%,-100%);cursor:pointer}
+.mk svg{width:22px;height:22px}
+.mk span{display:block;font-size:10px;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:4px;margin-top:2px;white-space:nowrap;color:#fff}
+.bigarrow svg{transition:transform .5s}
+
+/* ===== 白蓝主题（浅色） ===== */
+body{background:linear-gradient(180deg,#eaf3ff 0%,#f7faff 70%,#eef4fc 100%);color:#1c1c1e}
+#phone{background:#fff;border-color:#d9e2ef;box-shadow:0 30px 70px rgba(31,58,99,.18),0 0 0 10px #e9eff8}
+#statusbar{color:#1c1c1e}
+#statusbar .sb-right svg{stroke:#1c1c1e}
+#statusbar .sb-right svg rect{fill:#1c1c1e}
+.screen{background:#f5f7fb}
+.nav{background:rgba(255,255,255,.94)}
+.nav .back{background:#eef1f6}
+.nav .back svg{stroke:#1c1c1e}
+.nav .nav-r .chip{background:#e8f0ff;color:#0a6cff}
+.sub,.topbar,.row .t .d,.dest-item .dd,.busbar .bt .l2,.spatial .lbl,.sense-stats .s .k,.live-head,.dist small,.sos-ok .l2{color:#7a8699}
+.card{background:#fff;border:1px solid #e5eaf2;box-shadow:0 1px 2px rgba(31,58,99,.05)}
+.btn.primary{background:#0a6cff;color:#fff}
+.btn.primary:active{background:#0959d6}
+.btn.primary svg{stroke:#fff}
+.btn.dark{background:#eef1f6;color:#1c1c1e}
+.row{border-bottom-color:#eef1f6}
+.tag{background:#e8f0ff;color:#0a6cff;border-color:#cfe0ff}
+.toggle{background:#e2e2e6}
+.toggle.on{background:#30d158}
+.seg{background:#e9edf3}
+.seg button{color:#6e7b8e}
+.seg button.on{background:#fff;color:#0a6cff;box-shadow:0 1px 3px rgba(31,58,99,.16)}
+.slider-row input[type=range]{accent-color:#0a6cff}
+.slider-row .val{color:#0a6cff}
+.qcard{background:#fff;border:1px solid #e5eaf2}
+.qcard:active{border-color:#0a6cff}
+.qcard .qd{color:#7a8699}
+.voice-area .vmic{background:radial-gradient(circle at 32% 28%,#3b9dff,#007aff 72%);box-shadow:0 12px 36px rgba(10,108,255,.26)}
+.vmic svg{stroke:#fff!important}
+.vmic::before,.vmic::after{border-color:rgba(10,108,255,.32)}
+.wave i{background:#0a6cff}
+#tabbar{background:rgba(255,255,255,.96);border-top-color:#e5eaf2}
+.tab svg{fill:#98a2b3}
+.tab span{color:#8a94a6}
+.tab.on svg{fill:#0a6cff}
+.tab.on span{color:#0a6cff}
+.stat-chip{background:#e8fff0}
+.live-wrap{background:#f5f7fb}
+.progress{background:#e3e8f0}
+.progress i{background:linear-gradient(90deg,#0a6cff,#38b0ff)}
+.bigarrow{background:#fff;border-color:#dbe4f0}
+.bigarrow svg{stroke:#0a6cff}
+.nextstep{background:#fff;border:1px solid #e5eaf2}
+.nextstep .dir{color:#0a6cff}
+.spatial{background:#fff;border:1px solid #e5eaf2;border-radius:18px;padding:14px 18px}
+.spatial .ear{background:#eef1f6;color:#1c1c1e;border:1px solid #d5dce6}
+.spatial .ear.on{background:linear-gradient(135deg,#0a6cff,#5b88d6);color:#fff;border-color:transparent;box-shadow:0 0 0 4px rgba(10,108,255,.14),0 4px 14px rgba(10,108,255,.3)}
+.spatial .mid i{background:linear-gradient(180deg,#5b88d6,#cfe0f3)}
+.spatial.dir-l .mid i:nth-child(-n+4){background:linear-gradient(180deg,#ffb800,#ffe89a);box-shadow:0 0 8px rgba(255,184,0,.4)}
+.spatial.dir-r .mid i:nth-child(n+6){background:linear-gradient(180deg,#ffb800,#ffe89a);box-shadow:0 0 8px rgba(255,184,0,.4)}
+.spatial::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at var(--wave-x,50%) 50%,rgba(10,108,255,.14) 0%,rgba(10,108,255,0) 60%);pointer-events:none;transition:all 1.2s cubic-bezier(.4,0,.2,1);z-index:0;opacity:.7}
+.spatial::after{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.05),transparent);z-index:0}
+.busbar{background:#fff;border:1px solid #e5eaf2}
+.arrive-card{background:rgba(255,255,255,.93)}
+.arrive-card .inner{background:#fff;border:1px solid #e5eaf2;box-shadow:0 20px 60px rgba(31,58,99,.18)}
+.dest-item{background:#fff;border-color:#e5eaf2}
+.dest-item.sel{border-color:#0a6cff;background:#eaf3ff}
+.searchbar{background:#f0f3f8}
+.searchbar input{color:#1c1c1e}
+.searchbar .mic{background:#e8f0ff}
+.searchbar .mic svg{stroke:#0a6cff}
+.step .dot{background:#0a6cff}
+.step .bar{background:#e3e8f0}
+.step .txt b{color:#0a6cff}
+.route-meta .m{background:#f0f3f8;color:#1c1c1e}
+.route-meta .m b{color:#0a6cff}
+.cam{background:linear-gradient(180deg,#dfe8f4,#c5d6e8);border-color:#d5dce6}
+/* 演示模式场景已在默认样式中定义（真实城市场景），亮色主题无需覆盖 */
+.sense-stats .s{background:#fff;border:1px solid #e5eaf2}
+.sense-stats .s .v{color:#0a6cff}
+.floors .f{background:#fff}
+.floors .f.on{border-color:#0a6cff;color:#0a6cff}
+.fam{background:#fff;border:1px solid #e5eaf2}
+.sos-ok{background:#fff}
+.quickcall button{background:#fff;border-color:#e5eaf2;color:#0a6cff}
+.cotype button{background:#fff;border-color:#e5eaf2;color:#1c1c1e}
+.cotype button.on{border-color:#0a6cff;color:#0a6cff;background:#eaf3ff}
+#screen-splash{background:radial-gradient(600px 400px at 50% 30%,#e6efff 0%,#f7faff 70%)}
+.logo{background:linear-gradient(145deg,#0a6cff,#38b0ff)}
+.logo svg{stroke:#fff}
+#screen-splash .name{color:#1c1c1e}
+#screen-splash .slogan{color:#8e8e93}
+.loaddots i{background:#0a6cff}
+.avatar{background:linear-gradient(145deg,#0a6cff,#38b0ff);color:#fff}
+.listen-tip{color:#0a6cff}
+.mapmini{background:#eef3fa}
+/* ===== 简约大气 + 真实感知组件 ===== */
+.qcard{box-shadow:none}
+.qcard .qi{width:40px;height:40px;border-radius:12px}
+.indoor-hero{display:flex;align-items:center;gap:14px;cursor:pointer;background:#fff;border:1px solid #e5eaf2;border-radius:18px;padding:16px;transition:.15s}
+.indoor-hero:active{border-color:#0a6cff}
+.indoor-hero .ih-l{flex:1;min-width:0}
+.indoor-hero .ih-t{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.indoor-hero .ih-t svg{width:18px;height:18px;fill:#0a6cff}
+.indoor-hero .ih-d{font-size:12px;color:#7a8699;margin:5px 0 9px;line-height:1.5}
+.indoor-hero .ih-m{width:118px;height:84px;border-radius:12px;background:#f0f6ff;border:1px solid #dbe8fb;position:relative;flex:none;overflow:hidden}
+.indoor-hero .ih-m svg{position:absolute;inset:0;width:100%;height:100%}
+.live-cam{position:relative;flex:1;border-radius:18px;overflow:hidden;background:#dfe8f4;border:1px solid #d5dce6;min-height:220px}
+.live-cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.live-cam canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3}
+/* ===== 实拍演示：3 段视频 + AI 检测框 + 震动图标 ===== */
+.live-cam .demo-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:1;transition:opacity .35s ease;background:#0b0f17}
+.live-cam .demo-video.active{opacity:1;z-index:2}
+/* ===== AI 检测框：动态化（角括呼吸 + 边框流光 + 距离变色） ===== */
+.det-box{
+  position:absolute;display:none;
+  border:2.2px solid #ff453a;border-radius:6px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 18px rgba(255,69,58,.55);
+  z-index:5;
+  pointer-events:none;
+  --prox:0.5; /* 由 JS 动态设置：0=远 1=近 */
+  transform:scale(calc(1 + var(--prox) * 0.12));
+  filter:drop-shadow(0 0 calc(6px + var(--prox) * 18px) rgba(255,69,58,calc(0.5 + var(--prox) * 0.4)));
+  transition:transform .6s cubic-bezier(.4,0,.2,1),filter .6s ease,border-color .4s ease,border-width .4s ease;
+}
+/* 边框流光：让框的边框像"蚂蚁线"一样流动，模拟 AI 持续扫描 */
+.det-box::before{content:"";position:absolute;inset:0;border-radius:6px;background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,255,255,.18) 8px 9px);mix-blend-mode:overlay;pointer-events:none;animation:detMarch 1.6s linear infinite;opacity:.7}
+/* 角括：四个角的 L 形角标 + 呼吸放大 */
+.det-box::after{content:""}
+/* 用真实的角标元素替代 ::after：左下→左上→右上→右下 顺时针 */
+.det-box .corner{position:absolute;width:14px;height:14px;pointer-events:none;transition:all .4s ease}
+.det-box .corner.c1{top:-2px;left:-2px;border-top:3px solid #ff453a;border-left:3px solid #ff453a;border-top-left-radius:5px}
+.det-box .corner.c2{top:-2px;right:-2px;border-top:3px solid #ff453a;border-right:3px solid #ff453a;border-top-right-radius:5px}
+.det-box .corner.c3{bottom:-2px;right:-2px;border-bottom:3px solid #ff453a;border-right:3px solid #ff453a;border-bottom-right-radius:5px}
+.det-box .corner.c4{bottom:-2px;left:-2px;border-bottom:3px solid #ff453a;border-left:3px solid #ff453a;border-bottom-left-radius:5px}
+/* 角标呼吸 + 旋摆 */
+.det-box.show .corner{animation:detCornerBreath 1.6s ease-in-out infinite}
+.det-box.show .corner.c1{animation-delay:0s}
+.det-box.show .corner.c2{animation-delay:.4s}
+.det-box.show .corner.c3{animation-delay:.8s}
+.det-box.show .corner.c4{animation-delay:1.2s}
+@keyframes detCornerBreath{
+  0%,100%{transform:scale(1) translate(0,0);opacity:.85}
+  50%{transform:scale(1.35) translate(0,0);opacity:1}
+}
+@keyframes detMarch{
+  0%{background-position:0 0}
+  100%{background-position:18px 18px}
+}
+/* 距离分级：远 / 中 / 近 */
+.det-box.prox-far{border-color:#ffd60a;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 14px rgba(255,214,10,.45);--prox:0.3}
+.det-box.prox-mid{border-color:#ff9f0a;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 16px rgba(255,159,10,.55);--prox:0.6}
+.det-box.prox-near{border-color:#ff1744;border-width:2.8px;box-shadow:0 0 0 1px rgba(255,255,255,.7),0 0 22px rgba(255,23,68,.7);--prox:1}
+.det-box.prox-near .det-label{animation:detLabelBeat .6s ease-in-out infinite}
+@keyframes detLabelBeat{
+  0%,100%{transform:scale(1);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  50%{transform:scale(1.08);box-shadow:0 4px 14px rgba(255,23,68,.5)}
+}
+.det-box.det-step2{border-color:#ff9f0a;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 18px rgba(255,159,10,.5)}
+.det-box.det-step2::before{background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,255,255,.22) 8px 9px)}
+.det-box.det-step2 .corner{border-color:#ff9f0a}
+.det-box.det-lamp{border-color:#ffd60a;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 18px rgba(255,214,10,.55)}
+.det-box.det-lamp::before{background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,255,255,.18) 8px 9px)}
+.det-box.det-lamp .corner{border-color:#ffd60a}
+.det-box.show{display:block}
+.det-box .det-label{position:absolute;left:0;top:-24px;background:rgba(255,69,58,.95);color:#fff;font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:6px;white-space:nowrap;letter-spacing:.2px;box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;align-items:center;gap:5px;transition:all .4s ease}
+.det-box .det-label::before{content:"";width:6px;height:6px;border-radius:50%;background:#7dffa8;box-shadow:0 0 6px #7dffa8;animation:detDot 1s ease-in-out infinite}
+.det-box.det-step2 .det-label{background:rgba(255,159,10,.95)}
+.det-box.det-lamp .det-label{background:rgba(255,214,10,.95);color:#1a1a1a}
+@keyframes detDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+/* AI 识别扫描线：自上而下往复，模拟目标检测扫描 */
+.det-box::selection{background:transparent}
+.det-box .scanline{position:absolute;left:0;right:0;height:22%;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.28),rgba(255,255,255,0));animation:detScan 1.6s linear infinite;pointer-events:none}
+@keyframes detScan{0%{top:0}50%{top:78%}100%{top:0}}
+.vibe-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.6);display:none;flex-direction:column;align-items:center;gap:8px;padding:18px 22px;background:rgba(255,59,48,.92);color:#fff;border-radius:18px;z-index:7;box-shadow:0 12px 30px rgba(255,59,48,.45);animation:vibeShake .25s linear infinite}
+.vibe-icon svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round}
+.vibe-icon span{font-size:13px;font-weight:800;letter-spacing:1px}
+.vibe-icon.show{display:flex}
+@keyframes vibeShake{0%{transform:translate(calc(-50% - 3px),-50%) scale(.6)}25%{transform:translate(calc(-50% + 3px),calc(-50% - 2px)) scale(.62)}50%{transform:translate(calc(-50% - 3px),calc(-50% + 2px)) scale(.6)}75%{transform:translate(calc(-50% + 3px),-50%) scale(.62)}100%{transform:translate(calc(-50% - 3px),-50%) scale(.6)}}
+.demo-stage{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:6;font-size:11.5px;font-weight:700;color:#fff;background:rgba(10,15,25,.7);backdrop-filter:blur(6px);padding:5px 12px;border-radius:14px;letter-spacing:.3px;display:none}
+.demo-stage.show{display:inline-block}
+/* 检测框位置/尺寸由 JS 轨迹动画驱动（跟随视频画面移动），此处仅设基准 */
+#det-step1{left:40%;top:42%;width:20%;height:14%}
+#det-step2{left:10%;top:52%;width:80%;height:30%}
+#det-lamp{left:4%;top:10%;width:18%;height:70%}
+.live-cam .nav-scene{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+.live-cam video[style*="display: block"]~.nav-scene,.live-cam video[style*="display:block"]~.nav-scene{display:none}
+.live-caption{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;background:linear-gradient(0deg,rgba(10,15,25,.88),rgba(10,15,25,0));color:#fff;font-size:14px;line-height:1.5;text-align:center;z-index:4}
+.live-caption .ct{font-weight:700}
+.cam-chips{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:6;pointer-events:none}
+.cam-chips .cc{font-size:11px;padding:4px 10px;border-radius:14px;background:rgba(10,15,25,.62);color:#fff;backdrop-filter:blur(4px)}
+.cam-chips .cc.ok{color:#7dffa8}
+.nav-banner{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e5eaf2;border-radius:16px;padding:12px 14px;margin:8px 0}
+.nav-banner .mini-arrow{width:56px;height:56px;border-radius:50%;background:#eef4ff;display:flex;align-items:center;justify-content:center;flex:none}
+.nav-banner .mini-arrow svg{width:30px;height:30px;stroke:#0a6cff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transition:transform .5s}
+.nav-banner .nb-d{flex:1;min-width:0}
+.nav-banner .nb-dist{font-size:22px;font-weight:800;color:#0a6cff}
+.nav-banner .nb-dist small{font-size:12px;color:#7a8699;font-weight:600}
+.nav-banner .nb-next{font-size:13px;color:#1c1c1e;margin-top:2px}
+.nav-banner .nb-next b{color:#0a6cff}
+.cam canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3}
+.sos-mini{border:none;background:#fff1f2;color:#e11d48;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer}
+.sos-mini:active{background:#ffe4e6}
+/* ===== 苹果式轻盈分层（iOS HIG / Jony Ive 设计语言） ===== */
+body{background:#f2f2f7}
+#phone{background:#f2f2f7;border-color:#dfe3ea;box-shadow:0 30px 80px rgba(20,30,50,.22),0 0 0 10px #e8ecf2}
+.screen{background:#f2f2f7}
+#statusbar{background:linear-gradient(180deg,#f2f2f7 55%,rgba(242,242,247,0))}
+.card{background:#fff;border:none;border-radius:18px;box-shadow:0 2px 14px rgba(20,30,50,.07)}
+.row{border-bottom-color:#ececee}
+.sub,.topbar,.row .t .d,.dest-item .dd,.busbar .bt .l2,.spatial .lbl,.sense-stats .s .k,.live-head,.dist small,.sos-ok .l2{color:#8e8e93}
+.tag{background:rgba(0,122,255,.1);color:#007aff;border:none}
+.btn.primary{background:#007aff}
+.btn.primary:active{background:#0062cc}
+.btn.dark{background:rgba(120,120,128,.12);color:#000}
+.nav{background:rgba(242,242,247,.85);border-bottom:1px solid rgba(0,0,0,.08)}
+.nav .title{font-size:28px;font-weight:800;letter-spacing:-.3px}
+.nav .nav-r .chip{background:rgba(0,122,255,.1);color:#007aff}
+.nav .back{background:rgba(120,120,128,.14)}
+.nav .back svg{stroke:#000}
+.seg{background:rgba(120,120,128,.14)}
+.seg button{color:#7c7c80}
+.seg button.on{background:#fff;color:#007aff;box-shadow:0 1px 4px rgba(20,30,50,.12)}
+.searchbar{background:#f2f2f7}
+.searchbar .mic{background:rgba(0,122,255,.1)}
+.searchbar .mic svg{stroke:#007aff}
+.toggle{background:rgba(120,120,128,.32)}
+.qcard{background:#fff;border:none;box-shadow:0 2px 14px rgba(20,30,50,.07)}
+.indoor-hero{background:#fff;border:none;border-radius:20px;box-shadow:0 2px 14px rgba(20,30,50,.07);transition:.15s}
+.indoor-hero:active{border:none;transform:scale(.99)}
+.vmic{background:linear-gradient(145deg,#0a84ff,#0064d6);box-shadow:0 16px 40px rgba(0,122,255,.35)}
+.vmic::before,.vmic::after{border-color:rgba(0,122,255,.25)}
+#tabbar{background:rgba(242,242,247,.92);border-top:none;box-shadow:0 -1px 0 rgba(0,0,0,.06)}
+.tab span{color:#98989f}
+.tab svg{fill:none;stroke:#98989f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.on span{color:#007aff}
+.tab.on svg{stroke:#007aff;fill:none}
+.stat-chip{background:rgba(52,199,89,.12);color:#28a745}
+.sense-stats .s{background:#fff;border:none;box-shadow:0 2px 10px rgba(20,30,50,.06)}
+.sense-stats .s .v{color:#007aff}
+.fam{background:#fff;border:none;border-radius:18px;box-shadow:0 2px 14px rgba(20,30,50,.07)}
+.dest-item{background:#fff;border:none;border-radius:16px;box-shadow:0 2px 12px rgba(20,30,50,.06)}
+.dest-item.sel{background:rgba(0,122,255,.07);box-shadow:0 0 0 1.5px #007aff inset}
+.sos-ok{background:#fff;border:none;box-shadow:0 2px 14px rgba(20,30,50,.08)}
+.quickcall button{background:#fff;border:none;box-shadow:0 2px 10px rgba(20,30,50,.06);color:#007aff}
+.cotype button{background:#fff;border:1px solid #e5e5ea;color:#1c1c1e}
+.cotype button.on{border-color:#007aff;color:#007aff;background:rgba(0,122,255,.06)}
+.busbar{background:#fff;border:none;box-shadow:0 2px 12px rgba(20,30,50,.07)}
+.nextstep,.spatial,.nav-banner{background:#fff;border:none;box-shadow:0 2px 12px rgba(20,30,50,.07)}
+.bigarrow,.mini-arrow{background:rgba(0,122,255,.08)}
+.floors .f{background:#fff;border:none;box-shadow:0 1px 6px rgba(20,30,50,.06)}
+.floors .f.on{color:#007aff;background:rgba(0,122,255,.08)}
+#screen-splash{background:linear-gradient(180deg,#f2f2f7 20%,#e6effb 100%)}
+.arrive-card{background:rgba(242,242,247,.94)}
+.arrive-card .inner{background:#fff;border:none;border-radius:22px;box-shadow:0 24px 60px rgba(20,30,50,.22)}
+.mapmini{background:#eef3fa}
+.screen h2.s{font-size:31px;font-weight:800;letter-spacing:-.3px}
+.live-cam{background:#dfe8f4;border:none;box-shadow:0 2px 14px rgba(20,30,50,.08)}
+.progress{background:rgba(120,120,128,.2)}
+/* ===== 潮酷强化（健康/活动类 App 风格：大数字 + 环形 + 柱状图 + 青蓝渐变） ===== */
+.btn.primary,.vmic{background:linear-gradient(135deg,#0a84ff,#00c6ff)}
+.btn.primary:active{background:linear-gradient(135deg,#0062cc,#00a8e8)}
+.progress i{background:linear-gradient(90deg,#0a84ff,#00c6ff)}
+.mini-arrow,.bigarrow{background:linear-gradient(135deg,#0a84ff,#00c6ff);box-shadow:0 6px 18px rgba(0,140,255,.28)}
+.mini-arrow svg,.bigarrow svg{stroke:#fff}
+.nb-dist{font-size:30px}
+.sense-stats .s .v{font-size:22px;background:linear-gradient(135deg,#0a84ff,#00c6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.today-card{display:flex;align-items:center;gap:16px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 2px 14px rgba(20,30,50,.07)}
+.today-ring{width:94px;height:94px;border-radius:50%;background:conic-gradient(#0a84ff 0deg,#00c6ff 300deg,#e8edf3 300deg 360deg);display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.today-ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}
+.today-ring .ring-in{position:relative;z-index:1;text-align:center}
+.today-ring .ring-v{font-size:21px;font-weight:800;letter-spacing:-.5px}
+.today-ring .ring-l{font-size:10px;color:#8e8e93;margin-top:1px}
+.today-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px 8px}
+.today-cell .tv{font-size:21px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#0a84ff,#00c6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.today-cell .tl{font-size:11px;color:#8e8e93;margin-top:1px}
+.today-hour{grid-column:1/-1;display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:4px;padding-top:6px;border-top:1px solid #f0f1f4}
+.today-hour i{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#0a84ff,#8fd0ff);opacity:.8;min-width:0}
+/* ===== 去 AI 味：克制精修（真实产品质感 / 少装饰） ===== */
+.btn.primary,.vmic{background:#007aff;box-shadow:none}
+.btn.primary:active{background:#0062cc}
+.vmic{width:118px;height:118px}
+.vmic::before,.vmic::after{display:none}
+.vmic svg{stroke:#fff}
+.wave{display:none}
+.progress i{background:#007aff}
+.mini-arrow,.bigarrow{background:rgba(0,122,255,.1);box-shadow:none}
+.mini-arrow svg,.bigarrow svg{stroke:#007aff}
+.nb-dist{color:#111}
+.sense-stats .s .v{color:#007aff;background:none;-webkit-text-fill-color:currentColor;font-size:20px}
+.card,.qcard,.indoor-hero,.fam,.dest-item,.busbar,.nextstep,.spatial,.nav-banner,.sense-stats .s,.floors .f,.sos-ok,.today-card{box-shadow:none}
+.card,.qcard,.busbar,.nextstep,.spatial,.nav-banner,.sense-stats .s,.fam,.dest-item,.floors .f{border:1px solid #ececee}
+.today-card{border-radius:16px;padding:16px}
+.today-ring{background:conic-gradient(#007aff 0deg 300deg,#e8edf3 300deg 360deg);box-shadow:none}
+.today-ring::before{inset:7px}
+.today-cell .tv{color:#111;background:none;-webkit-text-fill-color:currentColor;font-size:20px}
+.today-hour i{background:#dbe6f3;opacity:1}
+.today-hour i:nth-child(8),.today-hour i:nth-child(9),.today-hour i:nth-child(14),.today-hour i:nth-child(15){background:#007aff}
+.grp-title{font-size:13px;color:#8e8e93;font-weight:600;margin:2px 0 6px 16px}
+.grp-card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #ececee}
+.grp-card .row{padding:13px 16px;border-bottom:1px solid #ececee}
+.grp-card .row:last-child{border-bottom:none}
+.grp-card .row .n{font-size:15px}
+.grp-card .row .d{font-size:12px}
+/* ===== frontend-design 落地：去模板感 + 可访问性（WCAG AA） ===== */
+/* 大胆只花在麦克风一个"编排时刻"，删掉散落的光斑 */
+#screen-home::before,#screen-home::after{display:none}
+/* 对比度达标：次级文字加深（#5f6875 on #fff ≈ 6.1:1） */
+.sub,.topbar,.row .t .d,.dest-item .dd,.busbar .bt .l2,.spatial .lbl,.sense-stats .s .k,.live-head,.dist small,.sos-ok .l2,.grp-title,.today-cell .tl,.today-ring .ring-l{color:#5f6875}
+/* 主文字加深 */
+.nb-dist,.today-cell .tv,.dist,.live-caption{color:#0f0f12}
+/* 视障友好：字号体系放大 */
+.screen h2.s{font-size:34px}
+.listen-tip{font-size:15px}
+.row .t .n{font-size:15.5px}
+.qcard .qn{font-size:14.5px}
+/* 键盘/触控焦点可见 */
+.btn:focus-visible,.qcard:focus-visible,.row:focus-visible,.vmic:focus-visible,.sos-mini:focus-visible,.dest-item:focus-visible{outline:3px solid rgba(0,122,255,.55);outline-offset:2px}
+/* 尊重"减少动态"偏好 */
+@media (prefers-reduced-motion:reduce){
+  .vmic,.halo,.ripple,.vmicBreath{animation:none!important}
+  .screen{animation:none}
+}
+/* ===== 地图化首页：出行 App 本质（沉浸式地图 + 毛玻璃悬浮） ===== */
+#screen-home{background:#e9eff7}
+.map-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.map-bg svg{width:100%;height:100%;display:block}
+.home-content{position:relative;z-index:1}
+.home-content .card,.home-content .today-card,.home-content .grp-card .row{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.home-content .grp-card{background:transparent}
+.home-content .topbar{background:rgba(255,255,255,.55);border-radius:14px;padding:6px 10px}
+/* ===== 精致动态：自制动态麦克风 + 背景渐变光斑 + 分组独立卡片 ===== */
+.screen{background:linear-gradient(180deg,#eef4fc 0%,#f2f2f7 220px)}
+.vmic{position:relative;background:radial-gradient(circle at 32% 28%,#3b9dff,#007aff 72%);box-shadow:0 10px 28px rgba(0,122,255,.3),inset 0 -2px 6px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35);animation:vmicBreath 3.2s ease-in-out infinite;overflow:visible}
+.vmic::after{content:"";position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);width:78%;height:22px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,122,255,.32),transparent 70%);filter:blur(2px);animation:shadowBreath 3.2s ease-in-out infinite;pointer-events:none}
+.ripple{position:absolute;inset:-2px;border-radius:50%;border:2.5px solid rgba(0,122,255,.55);animation:ripple 3.6s ease-out infinite;pointer-events:none;opacity:0}
+.ripple:nth-child(2){animation-delay:.9s}
+.ripple:nth-child(3){animation-delay:1.8s}
+.ripple:nth-child(4){animation-delay:2.7s}
+.halo{position:absolute;inset:-13px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 68%,rgba(0,122,255,.6) 84%,transparent 100%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));animation:spin 6s linear infinite;pointer-events:none}
+.vmic.listening .halo{border-color:transparent;background:conic-gradient(from 0deg,transparent 0 40%,rgba(52,199,89,.7) 60%,transparent 100%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vmic.listening .ripple{animation-duration:1.8s;border-color:rgba(52,199,89,.6);opacity:1}
+@keyframes ripple{0%{transform:scale(1);opacity:.85}100%{transform:scale(2.05);opacity:0}}
+@keyframes vmicBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes shadowBreath{0%,100%{transform:translateX(-50%) scaleX(1);opacity:.85}50%{transform:translateX(-50%) scaleX(.92);opacity:.55}}
+#screen-home::before,#screen-home::after{content:"";position:absolute;border-radius:50%;pointer-events:none;filter:blur(6px)}
+#screen-home::before{top:150px;left:-50px;width:230px;height:230px;background:radial-gradient(circle,rgba(0,122,255,.13),transparent 65%);animation:driftA 16s ease-in-out infinite}
+#screen-home::after{top:330px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,198,255,.11),transparent 65%);animation:driftB 20s ease-in-out infinite}
+@keyframes driftA{0%,100%{transform:translate(0,0)}50%{transform:translate(36px,26px)}}
+@keyframes driftB{0%,100%{transform:translate(0,0)}50%{transform:translate(-28px,34px)}}
+@keyframes lightDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,-25px) scale(1.08)}}
+.grp-card{background:transparent;border:none;overflow:visible;display:flex;flex-direction:column;gap:10px}
+.grp-card .row{background:#fff;border:1px solid #ececee;border-radius:14px;padding:14px 16px}
+.profile-list{display:flex;flex-direction:column;gap:10px}
+.profile-list .row{background:#fff;border:1px solid #ececee;border-radius:14px;padding:13px 16px}
+.profile-list .row:last-child{border-bottom:1px solid #ececee}
+/* ===== iOS 玻璃质感 · 渐变 · 动态（最终覆盖层） ===== */
+/* 全局：纯净 iOS 分层背景 */
+body{background:linear-gradient(165deg,#edf3fc 0%,#f8fafd 50%,#eaf1fb 100%)}
+#phone{background:linear-gradient(180deg,#eef4fc 0%,#f4f8fd 60%,#f7f9fd 100%);border-color:rgba(255,255,255,.65);box-shadow:0 40px 90px rgba(20,40,80,.25),0 0 0 10px #e6ecf5,inset 0 0 0 .5px rgba(0,0,0,.04)}
+.screen{background:linear-gradient(180deg,#eef4fc 0%,#f6f8fc 320px,#f7f9fd 100%)}
+/* 各页面背景：柔光渐变光斑（让玻璃有东西可模糊） */
+#screen-nav-select,#screen-nav-route,#screen-nav-live,#screen-sense,#screen-indoor,#screen-guardian,#screen-sos,#screen-cobuild,#screen-settings,#screen-profile{
+  background:
+    radial-gradient(480px 340px at 88% -30px,rgba(0,122,255,.09),transparent 70%),
+    radial-gradient(420px 320px at -70px 58%,rgba(0,198,255,.08),transparent 70%),
+    linear-gradient(180deg,#eef4fc 0%,#f7f9fd 100%);
+}
+/* 所有非首页屏幕：纯蓝白渐变光斑背景（无紫色） */
+#screen-nav-route::before,#screen-sense::before,#screen-indoor::before,#screen-sos::before,#screen-cobuild::before,#screen-settings::before,#screen-profile::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(420px 360px at 18% 14%,rgba(0,122,255,.30),transparent 60%),
+    radial-gradient(380px 340px at 88% 32%,rgba(0,160,255,.26),transparent 60%),
+    radial-gradient(500px 400px at 30% 78%,rgba(0,180,255,.22),transparent 65%),
+    radial-gradient(360px 320px at 92% 92%,rgba(0,198,255,.18),transparent 60%),
+    linear-gradient(180deg,#eaf2ff 0%,#f4f8ff 35%,#eef4fc 70%,#f6f9ff 100%);
+  animation:lightDrift 14s ease-in-out infinite;
+}
+@keyframes lightDrift{0%,100%{filter:brightness(1)}50%{filter:brightness(1.05)}}
+/* 守护页渐变光斑（纯蓝白，无紫色） */
+#screen-guardian::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(420px 360px at 18% 14%,rgba(0,122,255,.22),transparent 60%),
+    radial-gradient(380px 340px at 88% 32%,rgba(0,150,255,.18),transparent 60%),
+    radial-gradient(500px 400px at 30% 78%,rgba(0,180,255,.14),transparent 65%),
+    radial-gradient(360px 320px at 92% 92%,rgba(0,198,255,.12),transparent 60%),
+    linear-gradient(180deg,#eaf2ff 0%,#f4f8ff 35%,#eef4fc 70%,#f6f9ff 100%);
+  animation:lightDrift 14s ease-in-out infinite;
+}
+/* 屏幕内容：让玻璃卡片层叠在渐变光斑之上（排除 .nav，保持其 sticky 定位不被破坏） */
+#screen-nav-route > *:not(.nav),#screen-sense > *:not(.nav),#screen-indoor > *:not(.nav),
+#screen-sos > *:not(.nav),#screen-cobuild > *:not(.nav),#screen-settings > *:not(.nav),#screen-profile > *:not(.nav){position:relative;z-index:1}
+/* 屏幕整体：纯蓝白渐变光斑（无紫色） */
+#screen-nav-route,#screen-sense,#screen-indoor,#screen-sos,#screen-cobuild,#screen-settings,#screen-profile{
+  position:relative;
+  background-image:
+    radial-gradient(480px 340px at 88% -30px,rgba(0,122,255,.08),transparent 70%),
+    radial-gradient(420px 320px at -70px 58%,rgba(0,180,255,.07),transparent 70%);
+}
+
+/* 导航栏：毛玻璃大标题 */
+.nav{background:rgba(255,255,255,.5);backdrop-filter:blur(26px) saturate(1.8);-webkit-backdrop-filter:blur(26px) saturate(1.8);border-bottom:1px solid rgba(255,255,255,.55)}
+.nav .title{background:linear-gradient(120deg,#0a6cff,#00b4ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+/* 标签栏：悬浮毛玻璃 */
+#tabbar{left:14px;right:14px;bottom:10px;height:74px;border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.82));backdrop-filter:blur(28px) saturate(1.9);-webkit-backdrop-filter:blur(28px) saturate(1.9);box-shadow:0 10px 34px rgba(20,40,80,.14),inset 0 1px 0 rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.6);padding-top:9px}
+#homeindicator{bottom:2px;background:rgba(60,60,70,.28)}
+.tab{transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.tab:active{transform:scale(.88)}
+.tab.on span{font-weight:700}
+.tab.on svg{filter:drop-shadow(0 3px 7px rgba(0,122,255,.45))}
+/* 卡片：玻璃 + 内高光（更通透，能看清地图底色） */
+.card,.qcard,.fam,.dest-item,.busbar,.nextstep,.spatial,.nav-banner,.sense-stats .s,.floors .f,.sos-ok,.today-card,.grp-card .row,.profile-list .row,.indoor-hero{
+  background:linear-gradient(150deg,rgba(255,255,255,.78),rgba(255,255,255,.6));
+  backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 10px 30px rgba(25,55,100,.1),inset 0 1px 0 rgba(255,255,255,.95);
+}
+.row:active,.dest-item:active{background:rgba(0,122,255,.05)}
+.dest-item.sel{background:linear-gradient(150deg,rgba(0,122,255,.1),rgba(0,198,255,.07));box-shadow:inset 0 0 0 1.5px rgba(0,122,255,.5)}
+/* 主按钮：渐变 + 扫光 + 按压 */
+.btn.primary{position:relative;overflow:hidden;background:linear-gradient(135deg,#0a84ff,#00c6ff);box-shadow:0 10px 24px rgba(0,122,255,.3);transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s}
+.btn.primary:active{transform:scale(.97);box-shadow:0 5px 14px rgba(0,122,255,.35)}
+.btn.primary::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);animation:sweep 3s ease-in-out infinite;pointer-events:none}
+@keyframes sweep{0%{left:-70%}55%{left:140%}100%{left:140%}}
+.btn.dark{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 6px 16px rgba(25,55,100,.06),inset 0 1px 0 rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.7)}
+/* 分段控件 / 搜索框：玻璃 */
+.seg{background:rgba(120,120,128,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:inset 0 1px 3px rgba(25,55,100,.08)}
+.searchbar{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 4px 16px rgba(25,55,100,.05),inset 0 1px 0 rgba(255,255,255,.9)}
+.searchbar input::placeholder{color:#9aa5b5}
+/* 相机 / 导航画面：蓝光描边 */
+.cam,.live-cam{border:1.5px solid rgba(0,122,255,.28);box-shadow:0 0 0 4px rgba(0,122,255,.06),0 14px 34px rgba(25,55,100,.12)}
+/* 箭头：渐变 + 柔光 */
+.mini-arrow,.bigarrow{background:linear-gradient(135deg,#0a84ff,#00c6ff);box-shadow:0 8px 20px rgba(0,122,255,.28)}
+.mini-arrow svg,.bigarrow svg{stroke:#fff}
+/* 状态胶囊 / 标签：玻璃 */
+.stat-chip{background:rgba(52,199,89,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.tag{background:rgba(0,122,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+/* 首页顶部：毛玻璃 */
+.home-content .topbar{background:rgba(255,255,255,.6);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);box-shadow:0 4px 18px rgba(25,55,100,.06)}
+/* 首页卡片入场：错落浮起 */
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#screen-home.active .today-card,#screen-home.active .grp-card .row{animation:riseIn .5s cubic-bezier(.22,1,.36,1) both}
+#screen-home.active .today-card{animation-delay:.05s}
+#screen-home.active .grp-card .row:nth-child(1){animation-delay:.12s}
+#screen-home.active .grp-card .row:nth-child(2){animation-delay:.18s}
+#screen-home.active .grp-card .row:nth-child(3){animation-delay:.24s}
+#screen-home.active .grp-card .row:nth-child(4){animation-delay:.3s}
+/* 页面切换：轻微模糊浮起 */
+@keyframes pageIn{from{opacity:0;transform:translateY(10px) scale(.992);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+/* 我的页列表：按压反馈 */
+.profile-list .row{transition:transform .2s}
+.profile-list .row:active{transform:scale(.98)}
+/* 启动页：渐变流动 + 标志浮动 */
+#screen-splash{background:linear-gradient(160deg,#e7f0ff 0%,#f7faff 45%,#e9f3ff 100%);background-size:220% 220%;animation:bgPan 14s ease-in-out infinite}
+@keyframes bgPan{0%,100%{background-position:0% 30%}50%{background-position:100% 70%}}
+.logo{animation:logoFloat 3.2s ease-in-out infinite;box-shadow:0 20px 46px rgba(0,122,255,.32)}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+/* SOS：常驻扩散光环 */
+.sos-btn{position:relative}
+.sos-btn::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(255,69,58,.35);animation:sosRing 1.8s ease-out infinite;pointer-events:none}
+@keyframes sosRing{0%{transform:scale(.94);opacity:1}100%{transform:scale(1.28);opacity:0}}
+
+/* ===== 家人守护页面（重写美化） ===== */
+#screen-guardian{gap:10px;overflow-y:auto;overflow-x:hidden}
+#screen-guardian::-webkit-scrollbar{display:none}
+/* 守护总览横幅 */
+.guard-hero{
+  position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+  padding:14px 16px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(43,110,240,.12) 0%,rgba(0,198,255,.08) 50%,rgba(255,255,255,.55) 100%);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:0 8px 22px rgba(43,110,240,.1),inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);
+  overflow:hidden;
+}
+.guard-hero::before{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(43,110,240,.18),transparent 70%);filter:blur(6px);pointer-events:none}
+.gh-left{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.gh-avatars{display:flex}
+.gh-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;border:2px solid #fff;box-shadow:0 4px 10px rgba(20,30,50,.18)}
+.gh-av:nth-child(2){margin-left:-10px}
+.gh-title{font-size:15.5px;font-weight:800;color:#0a1a36;letter-spacing:-.2px}
+.gh-sub{font-size:11.5px;color:#5f6875;margin-top:2px}
+.gh-pulse{display:flex;gap:3px;align-items:flex-end;height:22px}
+.gh-pulse .gh-dot{width:3px;border-radius:2px;background:linear-gradient(180deg,#0a84ff,#00c6ff);animation:ghBar 1.2s ease-in-out infinite}
+.gh-pulse .gh-dot:nth-child(1){height:10px;animation-delay:0s}
+.gh-pulse .gh-dot:nth-child(2){height:16px;animation-delay:.2s}
+.gh-pulse .gh-dot:nth-child(3){height:8px;animation-delay:.4s}
+@keyframes ghBar{0%,100%{transform:scaleY(.4);opacity:.6}50%{transform:scaleY(1);opacity:1}}
+/* 家人区段标题 */
+.guard-family{margin-top:2px}
+.gf-title{font-size:12px;color:#8e8e93;font-weight:600;margin:0 0 6px 6px;letter-spacing:.2px}
+/* 家人卡片 */
+/* 家人卡片：透明模糊玻璃质感（与首页卡片一致） */
+.fam-card{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px;border-radius:18px;margin-bottom:10px;
+  background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.45))!important;
+  backdrop-filter:blur(24px) saturate(1.9)!important;-webkit-backdrop-filter:blur(24px) saturate(1.9)!important;
+  border:1px solid rgba(255,255,255,.7)!important;
+  box-shadow:0 8px 28px rgba(25,55,100,.09),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.guard-card{
+  padding:14px 14px;border-radius:18px;margin-bottom:10px;
+  background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.45))!important;
+  backdrop-filter:blur(24px) saturate(1.9)!important;-webkit-backdrop-filter:blur(24px) saturate(1.9)!important;
+  border:1px solid rgba(255,255,255,.7)!important;
+  box-shadow:0 8px 28px rgba(25,55,100,.09),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.fam-card:active{transform:scale(.98)}
+.fam-l{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.fam-av{
+  width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;font-weight:800;flex:none;position:relative;
+  box-shadow:0 6px 14px rgba(25,55,100,.18),inset 0 1px 0 rgba(255,255,255,.4);
+}
+.fam-av span{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.fam-on{position:absolute;right:0;bottom:0;width:14px;height:14px;border-radius:50%;background:#30d158;border:2.5px solid #fff;box-shadow:0 0 0 1px rgba(48,209,88,.4);animation:famPulse 2.4s ease-in-out infinite}
+@keyframes famPulse{0%,100%{box-shadow:0 0 0 1px rgba(48,209,88,.4)}50%{box-shadow:0 0 0 5px rgba(48,209,88,0)}}
+.fam-info{flex:1;min-width:0}
+.fam-name{font-size:15px;font-weight:700;color:#1c1c2e;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fam-tag{font-size:10px;font-weight:600;color:#ff9f0a;background:rgba(255,159,10,.12);padding:2px 7px;border-radius:6px}
+.fam-loc{font-size:12px;color:#0a84ff;margin-top:4px;display:flex;align-items:center;gap:3px;font-weight:600}
+.fam-time{font-size:11.5px;color:#8e8e93;margin-top:2px}
+.fam-r{display:flex;gap:6px;flex:none}
+.fam-call,.fam-more{
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(43,110,240,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,background .2s;
+}
+.fam-call:active,.fam-more:active{transform:scale(.9)}
+.fam-call{background:linear-gradient(135deg,#0a84ff,#00c6ff);box-shadow:0 4px 12px rgba(43,110,240,.32)}
+.fam-call svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fam-more{background:rgba(120,120,128,.14)}
+.fam-more svg{fill:#5f6875}
+/* 守护卡片（设置项容器） */
+.guard-card{
+  padding:14px 14px;background:linear-gradient(150deg,rgba(255,255,255,.94),rgba(255,255,255,.82));
+  border:1px solid rgba(255,255,255,.7);border-radius:18px;margin-bottom:10px;
+  backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
+  box-shadow:0 8px 22px rgba(25,55,100,.06),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.guard-row{display:flex;align-items:center;gap:12px;padding:6px 0}
+.gr-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.gr-ic svg{width:18px;height:18px}
+.gr-t{flex:1;min-width:0}
+.gr-n{font-size:14px;font-weight:700;color:#1c1c2e}
+.gr-d{font-size:11.5px;color:#8e8e93;margin-top:2px}
+.guard-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.06),transparent);margin:2px 0}
+/* 守护头部 + 标签 */
+.guard-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.gh-pill{font-size:10.5px;font-weight:700;color:#0a6cff;background:rgba(43,110,240,.1);padding:3px 9px;border-radius:10px;letter-spacing:.2px}
+/* 迷你地图 */
+.guard-map{
+  position:relative;width:100%;height:130px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(160deg,#f0e9d6 0%,#e6dcc0 100%);
+  border:1px solid rgba(0,0,0,.04);
+  margin-bottom:10px;
+}
+.gm-grid{position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(255,255,255,.7) 1px,transparent 1px),linear-gradient(0deg,rgba(255,255,255,.7) 1px,transparent 1px);background-size:20px 20px;opacity:.5}
+.gm-route{position:absolute;left:18%;bottom:20%;width:64%;height:60%;background:linear-gradient(90deg,#0a84ff 0%,#0a84ff 50%,transparent 50%,transparent 100%);background-size:8px 2px;background-repeat:repeat-x;opacity:.85;border-radius:2px;mask:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%);-webkit-mask:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%)}
+.gm-me,.gm-mom,.gm-dad{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800;box-shadow:0 3px 8px rgba(0,0,0,.18);border:2px solid #fff;z-index:2}
+.gm-me{left:18%;bottom:20%;width:22px;height:22px;background:linear-gradient(135deg,#0a84ff,#00c6ff)}
+.gm-mom{left:74%;top:20%;width:20px;height:20px;background:linear-gradient(135deg,#ffb86b,#ff9f0a)}
+.gm-dad{left:48%;top:38%;width:18px;height:18px;background:linear-gradient(135deg,#5fa8ff,#0a84ff)}
+.gm-pulse{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(10,132,255,.5);animation:ripple 2.4s ease-out infinite}
+.gm-tag-me,.gm-tag-mom,.gm-tag-dad{position:absolute;font-size:9px;font-weight:800;color:#1c1c2e;background:rgba(255,255,255,.92);padding:1px 5px;border-radius:6px;backdrop-filter:blur(4px);box-shadow:0 2px 4px rgba(0,0,0,.08);z-index:3;letter-spacing:.2px}
+.gm-tag-me{left:calc(18% - 8px);bottom:calc(20% - 16px)}
+.gm-tag-mom{left:calc(74% - 6px);top:calc(20% - 14px)}
+.gm-tag-dad{left:calc(48% - 7px);top:calc(38% - 14px)}
+/* 位置行 */
+.guard-loc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:6px;border-top:1px solid rgba(0,0,0,.05)}
+.guard-loc-row .glr-l{flex:1 1 auto;min-width:0;min-width:120px}
+.guard-loc-row .btn{flex-shrink:0;white-space:nowrap;width:auto}
+.glr-l{min-width:0;flex:1}
+.glr-t{font-size:14px;font-weight:700;color:#1c1c2e;letter-spacing:-.2px;word-break:keep-all}
+.glr-d{font-size:11.5px;color:#8e8e93;margin-top:2px;word-break:keep-all}
+/* 守护记录 */
+.guard-log{display:flex;flex-direction:column;gap:10px;margin-top:8px;padding-left:4px;border-left:2px solid rgba(43,110,240,.08)}
+.glog-item{display:flex;align-items:flex-start;gap:10px;position:relative;padding-left:14px}
+.glog-item::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:2px;background:rgba(43,110,240,.15)}
+.glog-dot{width:10px;height:10px;border-radius:50%;flex:none;margin-top:4px;box-shadow:0 0 0 3px rgba(255,255,255,.9),0 0 0 4px rgba(43,110,240,.1);position:relative;z-index:1}
+.glog-l{flex:1;min-width:0}
+.glog-t{font-size:13.5px;font-weight:600;color:#1c1c2e}
+.glog-d{font-size:11.5px;color:#8e8e93;margin-top:2px}
+/* 求助提示 */
+.guard-tip{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+  background:linear-gradient(135deg,rgba(255,69,58,.06),rgba(255,159,10,.04));
+  border:1px solid rgba(255,69,58,.12);border-radius:14px;
+  font-size:12.5px;line-height:1.6;color:#5f6875;
+}
+.gt-ic{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,69,58,.1);border-radius:50%}
+.gt-ic svg{width:13px;height:13px}
+
+/* 出行页：常用目的地可滚动 + 规划按钮固定在底栏上方 */
+#screen-nav-select{gap:0}
+#screen-nav-select .nav{position:sticky;top:-64px;margin:-64px -18px 0;padding:78px 14px 10px;z-index:20}
+#screen-nav-select .searchbar{margin:0 0 10px}
+#screen-nav-select .pref-block{margin:0 0 12px;flex:none}
+#screen-nav-select .dest-scroll{
+  flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  padding:4px 2px 12px;-webkit-overflow-scrolling:touch;
+}
+#screen-nav-select .dest-scroll::-webkit-scrollbar{display:none}
+#screen-nav-select .dest-scroll .sub{margin:0 0 10px;font-weight:600;color:#1c1c1e;letter-spacing:-.2px}
+#screen-nav-select .dest-scroll .dest-item{margin-bottom:10px}
+#screen-nav-select .plan-cta{
+  flex:none;padding:10px 0 14px;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.85) 35%,rgba(255,255,255,.95) 100%);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  position:sticky;bottom:0;z-index:15;
+}
+#screen-nav-select .plan-cta .btn{width:100%;height:52px;font-size:16px;font-weight:700}
+/* 麦克风：更亮的渐变玻璃球 */
+.vmic{background:radial-gradient(circle at 30% 26%,#4aa4ff 0%,#007aff 55%,#0060d0 100%);box-shadow:0 12px 30px rgba(0,122,255,.32),inset 0 2px 6px rgba(255,255,255,.4),inset 0 -3px 8px rgba(0,40,120,.25)}
+/* ===== 卡片入场 + 图标呼吸（文字不参与动画） ===== */
+#screen-home.active .today-card,#screen-home.active .grp-card .row{animation:riseIn .5s cubic-bezier(.22,1,.36,1) both}
+#screen-home.active .today-card{animation-delay:.05s}
+#screen-home.active .grp-card .row:nth-child(1){animation-delay:.12s}
+#screen-home.active .grp-card .row:nth-child(2){animation-delay:.18s}
+#screen-home.active .grp-card .row:nth-child(3){animation-delay:.24s}
+#screen-home.active .grp-card .row:nth-child(4){animation-delay:.3s}
+.grp-card .row .ic{animation:icPulse 3.2s ease-in-out infinite}
+.grp-card .row:nth-child(1) .ic{animation-delay:.3s}
+.grp-card .row:nth-child(2) .ic{animation-delay:.9s}
+.grp-card .row:nth-child(3) .ic{animation-delay:1.5s}
+.grp-card .row:nth-child(4) .ic{animation-delay:2.1s}
+@keyframes icPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+/* ===== 导航栏：常态蓝白渐变 + 选中渐变胶囊 ===== */
+#tabbar{background:linear-gradient(180deg,rgba(212,232,255,.82),rgba(255,255,255,.94))}
+.tab{position:relative;border-radius:16px;padding:3px 9px;transition:transform .28s cubic-bezier(.34,1.56,.64,1),background .25s}
+.tab.on{background:linear-gradient(135deg,rgba(0,122,255,.16),rgba(0,198,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.tab.on span{background:linear-gradient(120deg,#0a6cff,#00b4ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+.tab.on svg{stroke:#0a6cff;fill:none;filter:drop-shadow(0 2px 5px rgba(0,122,255,.4))}
+/* ===== 首页：麦克风下沉 + 收起地图模式 + 图表说明 ===== */
+/* 麦克风固定在底部导航栏上方，始终可用 */
+#screen-home .voice-area{position:fixed;left:0;right:0;bottom:96px;z-index:24;flex-direction:column;align-items:center;gap:12px;pointer-events:none}
+#screen-home .voice-area .vmic,#screen-home .voice-area .listen-tip{pointer-events:auto}
+#screen-home{padding-bottom:230px}
+/* 安全分环：满分整圈连续渐变 + 渐变流动 + 高光点环绕（文字保持静止） */
+@property --arc{syntax:"<angle>";initial-value:0deg;inherits:false}
+.today-ring{background:conic-gradient(from var(--arc,0deg),#0a6cff 0deg,#00c6ff 120deg,#4aa4ff 240deg,#0a6cff 360deg);animation:ringFlow 5s linear infinite;box-shadow:0 0 20px rgba(0,122,255,.16)}
+@keyframes ringFlow{to{--arc:360deg}}
+/* 环形图中心：毛玻璃质感（与外部一致） */
+.today-ring::before{background:linear-gradient(150deg,rgba(255,255,255,.7),rgba(255,255,255,.5))!important;backdrop-filter:blur(10px) saturate(1.6);-webkit-backdrop-filter:blur(10px) saturate(1.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(0,40,120,.06)}
+.today-ring::after{content:"";position:absolute;top:50%;left:50%;width:9px;height:9px;border-radius:50%;background:#8fd0ff;box-shadow:0 0 12px 3px rgba(0,198,255,.55);z-index:2;animation:dotOrbit 5s linear infinite}
+@keyframes dotOrbit{from{transform:translate(-50%,-50%) rotate(0deg) translateY(-36px) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg) translateY(-36px) rotate(-360deg)}}
+/* 柱状图：说明 + 生长入场 + 高峰呼吸 */
+.hour-label{font-size:11px;color:#8e8e93;grid-column:1/-1;margin:2px 0 4px}
+.today-hour i{transform-origin:bottom;animation:barGrow .9s cubic-bezier(.22,1,.36,1) both}
+@keyframes barGrow{from{transform:scaleY(.1);opacity:.4}to{transform:scaleY(1);opacity:1}}
+.today-hour i:nth-child(8),.today-hour i:nth-child(9),.today-hour i:nth-child(14),.today-hour i:nth-child(15){animation:barGrow .9s cubic-bezier(.22,1,.36,1) both,barPulse 2.6s ease-in-out 1s infinite}
+@keyframes barPulse{0%,100%{opacity:1}50%{opacity:.45}}
+/* 收起 / 展开按钮：玻璃圆钮 + 呼吸光晕 */
+.collapse-btn{position:fixed;left:50%;bottom:228px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.7);backdrop-filter:blur(16px) saturate(1.6);-webkit-backdrop-filter:blur(16px) saturate(1.6);box-shadow:0 8px 24px rgba(25,55,100,.2),inset 0 1px 0 rgba(255,255,255,.95);cursor:pointer;z-index:26;display:flex;align-items:center;justify-content:center;transition:transform .3s cubic-bezier(.34,1.56,.64,1);animation:collapseGlow 2.8s ease-in-out infinite}
+.collapse-btn svg{width:19px;height:19px;fill:none;stroke:#0a6cff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.collapse-btn:active{transform:translateX(-50%) scale(.88)}
+@keyframes collapseGlow{0%,100%{box-shadow:0 8px 24px rgba(25,55,100,.18)}50%{box-shadow:0 8px 30px rgba(0,122,255,.4)}}
+/* 收起状态：板块淡出下滑，地图完全露出 */
+.home-top,.today-card,.group{transition:opacity .45s ease,transform .5s cubic-bezier(.4,0,.2,1)}
+#screen-home.collapsed .home-top,#screen-home.collapsed .today-card,#screen-home.collapsed .group{opacity:0;transform:translateY(26px);pointer-events:none}
+#screen-home.collapsed .today-card,#screen-home.collapsed .grp-card .row{animation:none}
+#screen-home.collapsed .collapse-btn svg{transform:rotate(180deg)}
+/* 地图动态：缓慢漂移缩放 + 导航路径流动 */
+.map-bg svg{animation:mapDrift 36s ease-in-out infinite}
+@keyframes mapDrift{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.05) translate(-8px,-6px)}}
+.map-bg polyline{animation:dashFlow 2.4s linear infinite}
+@keyframes dashFlow{to{stroke-dashoffset:-10}}
+/* ===== 灵动岛通知（真实还原：常态黑胶囊 → 连接设备展开为图标+分隔线+文字） ===== */
+#dynamic-island{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:120px;height:36px;border-radius:18px;background:#000;z-index:100;
+  display:flex;align-items:center;padding:0 14px;overflow:hidden;white-space:nowrap;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.28);
+  transition:width .55s cubic-bezier(.175,.885,.32,1.275),height .55s cubic-bezier(.175,.885,.32,1.275),border-radius .55s cubic-bezier(.175,.885,.32,1.275);
+}
+/* 左侧图标区：单个设备图标（AirPods 带电量环） */
+#dynamic-island .di-icons{display:flex;align-items:center;gap:6px;flex:none;opacity:0;transform:scale(.7);transition:opacity .22s .14s,transform .4s .14s cubic-bezier(.34,1.56,.64,1)}
+#dynamic-island .di-i{width:26px;height:26px;display:flex;align-items:center;justify-content:center;position:relative}
+#dynamic-island .di-i svg{width:22px;height:22px;display:block;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#dynamic-island .di-i:empty{display:none}
+/* 图标区与文字区之间的细分隔线 */
+#dynamic-island .di-divider{width:1px;height:18px;background:rgba(255,255,255,.28);margin:0 12px 0 6px;flex:none;opacity:0;transition:opacity .2s .18s}
+/* 右侧两行文字 */
+#dynamic-island .di-txt{display:flex;flex-direction:column;justify-content:center;min-width:0;opacity:0;transform:translateX(-6px);transition:opacity .25s .2s,transform .4s .2s cubic-bezier(.34,1.56,.64,1)}
+#dynamic-island .di-t1{font-size:13px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:.1px}
+#dynamic-island .di-t2{font-size:11px;color:rgba(255,255,255,.65);line-height:1.2;margin-top:1px}
+#dynamic-island .di-time{margin-left:auto;padding-left:12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.5);opacity:0;transition:opacity .25s .24s}
+/* 展开状态：保持 36px 高度，宽度拉长为长胶囊（约屏宽70%，贴近真实） */
+#dynamic-island.show{width:280px;height:36px;border-radius:18px}
+#dynamic-island.show .di-icons,#dynamic-island.show .di-txt,#dynamic-island.show .di-divider{opacity:1;transform:none}
+#dynamic-island.show .di-time{opacity:1}
+#dynamic-island.show~#statusbar{opacity:0}
+#statusbar{transition:opacity .4s}
+/* ===== Liquid Glass 强化（最终覆盖） ===== */
+/* 1) 全屏流动渐变背景层：手机内纯蓝白配色 */
+.liquid-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:linear-gradient(160deg,#EAF3FF 0%,#F4F8FE 35%,#DCEBFF 70%,#E8F1FE 100%);
+  background-size:300% 300%;animation:liquidFlow 14s ease-in-out infinite;
+  border-radius:50px;
+}
+.liquid-bg::before,.liquid-bg::after{content:"";position:absolute;border-radius:50%;filter:blur(50px);opacity:.6;pointer-events:none}
+.liquid-bg::before{width:360px;height:360px;left:-80px;top:18%;background:radial-gradient(circle,rgba(43,110,240,.35),transparent 70%);animation:floatA 12s ease-in-out infinite}
+.liquid-bg::after{width:340px;height:340px;right:-60px;bottom:8%;background:radial-gradient(circle,rgba(91,141,239,.3),transparent 70%);animation:floatB 14s ease-in-out infinite}
+@keyframes liquidFlow{0%,100%{background-position:0% 30%}50%{background-position:100% 70%}}
+@keyframes floatA{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.1)}}
+@keyframes floatB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,-40px) scale(1.05)}}
+/* 2) 标签栏：完全不透明纯白 + 玻璃感（用 box-shadow/边框/内高光，不再透出底色 → 三个 tab 视觉完全一致） */
+#tabbar{left:14px;right:14px;bottom:10px;height:74px;border-radius:28px;background:rgb(255,255,255);background-image:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 12px 38px rgba(20,40,80,.18),inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
+/* 3) 卡片玻璃：降透明度让底层色彩透出来 */
+.card,.qcard,.fam,.dest-item,.busbar,.nextstep,.spatial,.nav-banner,.sense-stats .s,.floors .f,.sos-ok,.today-card,.grp-card .row,.profile-list .row,.indoor-hero{
+  background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.45))!important;
+  backdrop-filter:blur(24px) saturate(1.9)!important;-webkit-backdrop-filter:blur(24px) saturate(1.9)!important;
+  border:1px solid rgba(255,255,255,.7)!important;
+  box-shadow:0 8px 28px rgba(25,55,100,.09),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+/* 4) 导航栏：玻璃大标题更强 */
+.nav{background:rgba(255,255,255,.45)!important;backdrop-filter:blur(28px) saturate(2)!important;-webkit-backdrop-filter:blur(28px) saturate(2)!important;border-bottom:1px solid rgba(255,255,255,.5)!important}
+/* 5) 麦克风：液态玻璃 + 果冻按压 */
+.vmic{background:radial-gradient(circle at 30% 26%,#4aa4ff 0%,#007aff 55%,#0060d0 100%)!important;box-shadow:0 14px 36px rgba(0,122,255,.4),inset 0 2px 8px rgba(255,255,255,.5),inset 0 -3px 10px rgba(0,40,120,.3)!important;transition:transform .25s cubic-bezier(.34,1.56,.64,1)!important}
+.vmic:active{transform:scale(.88) !important}
+/* 6) 按钮：果冻按压 */
+.btn,.qcard,.dest-item,.row{transition:transform .2s cubic-bezier(.34,1.56,.64,1)!important}
+.btn:active,.qcard:active,.dest-item:active{transform:scale(.96)!important}
+/* 7) Tab 项：彻底清除渐变文字（之前的 background-clip:text + text-fill-color:transparent 让 color 失效） */
+.tab{background:transparent!important;border-radius:0!important;box-shadow:none!important}
+.tab span{color:rgba(43,110,240,.7)!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;-webkit-text-fill-color:rgba(43,110,240,.7)!important;font-weight:500}
+.tab svg{stroke:rgba(43,110,240,.55)!important;fill:none!important}
+.tab.on{background:transparent!important;box-shadow:none!important}
+.tab.on span{color:#2B6EF0!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;-webkit-text-fill-color:#2B6EF0!important;font-weight:700}
+.tab.on svg{stroke:#2B6EF0!important;fill:none!important;filter:drop-shadow(0 2px 5px rgba(43,110,240,.35))}
+.tab{transition:transform .25s cubic-bezier(.34,1.56,.64,1)!important}
+.tab:active{transform:scale(.88)!important}
+/* 7b) .nav 顶部标题：彻底清除渐变文字（行 1164 同样的问题） */
+.nav .title{color:#1c1c2e!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;-webkit-text-fill-color:#1c1c2e!important}
+/* 8) 错误兜底：.home-content 在液态背景上透出 */
+.screen{background:transparent!important}
+/* 8b) 首页：屏幕本身不滚动（地图固定为背景），由 home-content 内部滚动 */
+#screen-home{
+  background:linear-gradient(180deg,#d8e6ff 0%,#eaf2ff 35%,#f4f9ff 65%,#e0eaff 100%)!important;
+  overflow:hidden!important;
+}
+/* 8b-fix) 首页内容：作为独立滚动容器，覆盖在地图背景之上，滚动时地图不动 */
+.home-content{
+  position:absolute!important;inset:0!important;
+  padding:64px 18px 230px!important;
+  overflow-y:auto!important;scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.home-content::-webkit-scrollbar{display:none!important}
+/* 8b-fix) #phone 蓝白渐变底色（带动态，非首页屏幕共享） */
+#phone{
+  background:linear-gradient(165deg,#d8e6ff 0%,#eaf2ff 30%,#f4f9ff 60%,#e0eaff 100%)!important;
+  background-size:200% 200%!important;
+  background-attachment:fixed!important;
+  animation:blueFlow 18s ease-in-out infinite!important;
+}
+@keyframes blueFlow{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
+/* 8b-fix2) 首页地图背景：真实地图容器（限定只在 #screen-home 中显示） */
+#screen-home .map-bg{
+  display:block!important;
+  position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;
+  background:transparent!important;
+}
+/* 半透明白色蒙版：提亮地图、让上方卡片内容更清晰 */
+#screen-home .map-bg::after{
+  content:"";position:absolute;inset:0;z-index:500;pointer-events:none;
+  background:rgba(255,255,255,.5);
+}
+/* 隐藏旧的模拟 SVG 地图 */
+#screen-home .map-bg svg{display:none!important}
+/* 真实地图（Leaflet + 高德瓦片） */
+#real-map{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  z-index:0!important;
+  background:linear-gradient(180deg,#d8e6ff 0%,#eaf2ff 35%,#f4f9ff 65%,#e0eaff 100%)!important;
+}
+#real-map .leaflet-control-container{display:none!important}
+#real-map .leaflet-pane{z-index:0!important}
+/* 9) 手机外 body 背景：纯色（iOS 系统灰），完全去掉彩色 */
+html,body{background:#e5e5ea!important}
+body{background:#e5e5ea!important;background-image:none!important}
+/* 9b) html 也设（避免 html 默认色） */
+html{background:#e5e5ea!important}
+</style>
+<script src="assets/tf.min.js"></script>
+<script src="assets/coco-ssd.min.js"></script>
+<script>
+/* ====== 终极兜底覆盖（DOM 顺序最后，胜过前面所有 !important） ====== */
+(function(){
+  var css = ''
+  + 'html,body{background:#e5e5ea !important;background-image:none !important;}'
+  // 关键：#phone 用蓝白渐变背景（带动态效果，旅行板块等所有屏幕共享）
+  + '#phone{'
+  + 'background:linear-gradient(165deg,#d8e6ff 0%,#eaf2ff 30%,#f4f9ff 60%,#e0eaff 100%) !important;'
+  + 'background-size:200% 200% !important;'
+  + 'background-attachment:fixed !important;'
+  + 'animation:blueFlow 18s ease-in-out infinite !important;'
+  + '}'
+  // 蓝白渐变动态（柔和漂移）
+  + '@keyframes blueFlow{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}'
+  // 关键：底栏改为完全不透明纯白（不再透出屏幕底色）→ 三个 tab 视觉 100% 一致
+  + '#tabbar{background:rgb(255,255,255) !important;background-image:none !important;'
+  + 'backdrop-filter:none !important;-webkit-backdrop-filter:none !important;'
+  + 'border:1px solid rgba(0,0,0,.04) !important;box-shadow:0 12px 38px rgba(20,40,80,.18),inset 0 1.5px 0 rgba(255,255,255,.95) !important;}'
+  + '.tab{background:transparent !important;background-image:none !important;box-shadow:none !important;border-radius:0 !important;}'
+  + '.tab.on{background:transparent !important;background-image:none !important;box-shadow:none !important;}'
+  + '.tab span{color:rgba(43,110,240,.7) !important;background:none !important;-webkit-background-clip:initial !important;background-clip:initial !important;-webkit-text-fill-color:rgba(43,110,240,.7) !important;}'
+  + '.tab.on span{color:#2B6EF0 !important;background:none !important;-webkit-background-clip:initial !important;background-clip:initial !important;-webkit-text-fill-color:#2B6EF0 !important;font-weight:700 !important;}'
+  + '.tab svg{stroke:rgba(43,110,240,.55) !important;fill:none !important;background:none !important;}'
+  + '.tab.on svg{stroke:#2B6EF0 !important;fill:none !important;background:none !important;filter:drop-shadow(0 2px 5px rgba(43,110,240,.35)) !important;}';
+  // 在 </body> 前注入
+  document.addEventListener('DOMContentLoaded', function(){
+    var s = document.createElement('style');
+    s.id = 'force-override';
+    s.textContent = css;
+    document.body.appendChild(s);
+  });
+  // 同时立即注入（不等待 DOMContentLoaded）
+  var s2 = document.createElement('style');
+  s2.id = 'force-override-now';
+  s2.textContent = css;
+  (document.head || document.documentElement).appendChild(s2);
+})();
+</script>
+<script>
+/* ===== 全局状态 ===== */
+const state = { freq:'标准', spatial:true, speed:1, pitch:1, vib:'强' };
+let localTTS = false;  // 本地 edge-tts 晓晓服务可用性（首次失败后自动回退系统语音）
+let dest = '大运中心体育馆';
+let navTimers = [];
+let navStep = 0;
+let paused = false;
+let camStream = null;
+let camMode = 'sim';
+
+/* ===== 语音合成 ===== */
+let zhVoice = null;
+let currentAudio = null; // 当前正在播放的音频对象，用于快速点击时打断
+let speakSeq = 0;        // 语音请求序号：每次 speak 递增，只有最新请求才会真正播放
+/* TTS 预生成缓存：导航播报文本 → Blob URL，避免每次实时网络合成造成的延迟卡顿 */
+const ttsCache = new Map();
+const ttsQueue = [];     // 串行播报队列：保证多条播报按顺序播放，不重叠不卡顿
+let ttsPlaying = false;
+function ttsTextKey(text){
+  const rate=Math.round((state.speed-1)*100);
+  const pitch=Math.round((state.pitch-1)*20);
+  return (rate>=0?'+':'')+rate+'%|'+(pitch>=0?'+':'')+pitch+'Hz|'+text;
+}
+function prewarmTTS(text){
+  if(!localTTS || location.protocol.indexOf('http')!==0) return;
+  const key=ttsTextKey(text);
+  if(ttsCache.has(key)) return;
+  const url='/tts?text='+encodeURIComponent(text)
+    +'&rate='+encodeURIComponent((ttsTextKey(text).split('|')[0]||'+0%'))
+    +'&pitch='+encodeURIComponent((ttsTextKey(text).split('|')[1]||'+0Hz'));
+  fetch(url).then(r=>{ if(!r.ok) throw new Error(r.status); return r.blob(); })
+    .then(blob=>{
+      if(!ttsCache.has(key)) ttsCache.set(key, URL.createObjectURL(blob));
+    }).catch(()=>{});
+}
+function prewarmNavVoices(){
+  // 预生成导航演示全部分镜播报文本，避免演示中语音延迟卡顿
+  const all=[
+    '导航开始，直行三十米，前方有楼梯，注意听提示。',
+    '前方二十米检测到楼梯，请准备左转。',
+    '距楼梯十米，请继续左转靠拢。',
+    '警告！前方三米有楼梯，共5节，每节高十厘米，请放缓脚步。',
+    '即将到达楼梯顶部，请准备右转。',
+    '右转完成，沿人行道直行。',
+    '注意！左侧两米有灯杆，请向右侧稍偏闪避。',
+    '灯杆已过，继续直行。',
+    '您已到达大运中心体育馆，无障碍入口在右侧八米。本次导航结束。',
+    '已为您规划前往大运中心体育馆的盲道友好路线，全程 1.0 公里，预计 15 分钟。'
+  ];
+  all.forEach(prewarmTTS);
+}
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  zhVoice =
+    vs.find(v=>/tingting|siri/i.test(v.name)) ||                                                      // macOS/iOS：Tingting 即 Siri 中文音源
+    vs.find(v=>/^zh-CN/i.test(v.lang) && /xiaoxiao|xiaoyi|xiaochen|natural|online/i.test(v.name)) || // Windows：微软自然中文女声（最接近 Siri）
+    vs.find(v=>/^zh-CN/i.test(v.lang)) ||
+    vs.find(v=>/zh|cmn/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+/* 导航语音串行队列：时间轴播报按顺序一条条播完，避免互相打断造成「卡顿」 */
+const navVoiceQueue = [];
+let navVoiceBusy = false;
+let navSpeakSeq = 0; // 导航语音序号：每次 speakNav 递增，旧请求即使完成也会被丢弃，杜绝重叠双音
+/* 串行队列播报：把每一条播报按顺序加入队列，播完上一条再播下一条，
+   既保证每句语音完整念完，又不会产生重叠双音 */
+function speakNav(text){
+  // 字幕不在此处更新，避免队列中字幕已经变了但语音还没播（用户感觉"语音被切了"）
+  // 字幕在 pumpNavVoice 真正取出并开始播放时才更新，onended 播完时清空
+  // 入队尾；如果已有相同文本在排队则不再重复
+  if(navVoiceQueue[navVoiceQueue.length-1] === text) return;
+  navVoiceQueue.push(text);
+  pumpNavVoice();
+}
+function pumpNavVoice(){
+  if(navVoiceBusy) return;
+  const text = navVoiceQueue.shift();
+  if(!text) return;
+  navVoiceBusy = true;
+  const mySeq = ++navSpeakSeq;
+  const finishPlay = ()=>{ navVoiceBusy = false; pumpNavVoice(); };
+  // 字幕在「真正开始播放」时更新，播完时清空 —— 与实际音频严格同步
+  const updateCaption = ()=>{
+    const cap=document.getElementById('nav-caption');
+    if(cap && document.getElementById('screen-nav-live').classList.contains('active')) cap.innerHTML='<span class="ct">'+text+'</span>';
+  };
+  const clearCaption = ()=>{
+    const cap=document.getElementById('nav-caption');
+    if(cap && document.getElementById('screen-nav-live').classList.contains('active')) cap.innerHTML='&nbsp;';
+  };
+  const key = ttsTextKey(text);
+  const cached = localTTS ? ttsCache.get(key) : null;
+  if(cached && location.protocol.indexOf('http')===0){
+    const a = new Audio(cached);
+    a._blobUrl = null;
+    a._navSeq = mySeq;
+    currentAudio = a;
+    a.onended=()=>{ if(a._navSeq===navSpeakSeq && currentAudio===a) currentAudio=null; clearCaption(); finishPlay(); };
+    a.onerror=()=>{ if(a._navSeq===navSpeakSeq && currentAudio===a){ currentAudio=null; fallbackSpeak(text, updateCaption, ()=>{ clearCaption(); finishPlay(); }); } };
+    a.play().then(()=>{ updateCaption(); /* 已开播 */ }).catch(()=>{
+      if(a._navSeq===navSpeakSeq && currentAudio===a){ currentAudio=null; fallbackSpeak(text, updateCaption, ()=>{ clearCaption(); finishPlay(); }); }
+    });
+    return;
+  }
+  // 兜底实时合成：基于 promise 串行等播完
+  realtimeSpeak(text, ()=>{ clearCaption(); finishPlay(); }, mySeq, updateCaption);
+}
+function clearNavVoice(){
+  navVoiceQueue.length=0;
+  navVoiceBusy=false;
+  if(currentAudio){ try{ currentAudio.pause(); currentAudio.src=''; }catch(e){} currentAudio=null; }
+  if('speechSynthesis' in window){ try{ speechSynthesis.cancel(); }catch(e){} }
+}
+/* 实时合成并播报（供 speakNav 兜底与 speak 复用） */
+function realtimeSpeak(text, onDone, navSeq, onStart){
+  const mySeq = ++speakSeq;
+  // 统一旧请求核对：speak 用 speakSeq，speakNav 用 navSpeakSeq，任一不匹配都丢弃
+  const stillValid = ()=> mySeq===speakSeq && (navSeq===null || navSeq===undefined || navSeq===navSpeakSeq);
+  if(localTTS && location.protocol.indexOf('http')===0){
+    const rate=Math.round((state.speed-1)*100);
+    const pitch=Math.round((state.pitch-1)*20);
+    const url='/tts?text='+encodeURIComponent(text)
+      +'&rate='+encodeURIComponent((rate>=0?'+':'')+rate+'%')
+      +'&pitch='+encodeURIComponent((pitch>=0?'+':'')+pitch+'Hz');
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),6000);
+    fetch(url,{signal:ctrl.signal}).then(r=>{
+      if(!r.ok) throw new Error('tts '+r.status);
+      return r.blob();
+    }).then(blob=>{
+      clearTimeout(timer);
+      if(!stillValid()){ if(onDone) onDone(); return; }
+      const blobUrl=URL.createObjectURL(blob);
+      const a=new Audio(blobUrl);
+      a._blobUrl=blobUrl;
+      a._navSeq = navSeq||0;
+      currentAudio = a;
+      let started=false;
+      a.onended=()=>{ if(currentAudio===a){ try{URL.revokeObjectURL(blobUrl);}catch(e){} currentAudio=null; } if(onDone) onDone(); };
+      a.onerror=()=>{ if(currentAudio===a){ try{URL.revokeObjectURL(blobUrl);}catch(e){} currentAudio=null; } if(onDone) onDone(); };
+      a.play().then(()=>{ if(!started){ started=true; if(onStart) onStart(); } /* 播放成功 */ }).catch(()=>{ if(currentAudio===a) currentAudio=null; fallbackSpeak(text, onStart, onDone); });
+    }).catch(()=>{ clearTimeout(timer); if(stillValid()) localTTS=false; fallbackSpeak(text, onStart, onDone); });
+    return;
+  }
+  fallbackSpeak(text, onStart, onDone);
+}
+function speak(text){
+  // 1) 记录本次请求序号，后续所有旧请求即使返回也会被丢弃
+  const mySeq = ++speakSeq;
+  // 2) 打断之前正在播放的本地 TTS 音频（防止快速点击重叠）
+  if(currentAudio){
+    try{ currentAudio.pause(); currentAudio.src=''; }catch(e){}
+    try{ URL.revokeObjectURL(currentAudio._blobUrl||''); }catch(e){}
+    currentAudio = null;
+  }
+  // 3) 同时打断系统语音队列
+  if('speechSynthesis' in window){ try{ speechSynthesis.cancel(); }catch(e){} }
+  // 导航字幕始终跟随文字
+  const cap=document.getElementById('nav-caption');
+  if(cap && document.getElementById('screen-nav-live').classList.contains('active')) cap.innerHTML='<span class="ct">'+text+'</span>';
+  // 优先：TTS 预生成缓存（无网络延迟）；其次本地 edge-tts；最后系统语音
+  const key = ttsTextKey(text);
+  const cached = localTTS ? ttsCache.get(key) : null;
+  if(cached && location.protocol.indexOf('http')===0){
+    const a = new Audio(cached);
+    a._blobUrl = null; // 缓存由 ttsCache 统一管理，不在此处 revoke
+    currentAudio = a;
+    a.onended=()=>{ if(currentAudio===a) currentAudio=null; };
+    a.onerror=()=>{ if(currentAudio===a) currentAudio=null; fallbackSpeak(text); };
+    a.play().catch(()=>{ if(currentAudio===a) currentAudio=null; fallbackSpeak(text); });
+    return;
+  }
+  // 优先：本地 edge-tts 晓晓神经女声（更接近 Siri）；失败/未开启时回退系统语音
+  if(localTTS && location.protocol.indexOf('http')===0){
+    const rate=Math.round((state.speed-1)*100);
+    const pitch=Math.round((state.pitch-1)*20);
+    const url='/tts?text='+encodeURIComponent(text)
+      +'&rate='+encodeURIComponent((rate>=0?'+':'')+rate+'%')
+      +'&pitch='+encodeURIComponent((pitch>=0?'+':'')+pitch+'Hz');
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),5000);
+    fetch(url,{signal:ctrl.signal}).then(r=>{
+      if(!r.ok) throw new Error('tts '+r.status);
+      return r.blob();
+    }).then(blob=>{
+      clearTimeout(timer);
+      if(mySeq !== speakSeq) return; // 已被更新的请求取代，丢弃本次音频
+      const blobUrl=URL.createObjectURL(blob);
+      const a=new Audio(blobUrl);
+      a._blobUrl=blobUrl;
+      currentAudio = a; // 记录当前音频，便于下次打断
+      a.onended=()=>{ if(currentAudio===a){ try{URL.revokeObjectURL(blobUrl);}catch(e){} currentAudio=null; } };
+      a.onerror=()=>{ if(currentAudio===a){ try{URL.revokeObjectURL(blobUrl);}catch(e){} currentAudio=null; } };
+      a.play().catch(()=>{ if(currentAudio===a) currentAudio=null; fallbackSpeak(text); });
+    }).catch(()=>{ clearTimeout(timer); if(mySeq===speakSeq) localTTS=false; if(mySeq===speakSeq) fallbackSpeak(text); });
+    return;
+  }
+  fallbackSpeak(text);
+}
+function fallbackSpeak(text, onStart, onEnd){
+  if(!('speechSynthesis' in window)){ if(onEnd) onEnd(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = state.speed;
+  u.pitch = state.pitch;
+  if(zhVoice) u.voice = zhVoice;
+  let started=false;
+  // 关键：监听 onstart / onend —— 让串行队列在 speechSynthesis 真正播完后再推进
+  // 否则之前的实现会立即 finishPlay，导致下一句和本句同时播放，听起来"没念完"
+  u.onstart = ()=>{ if(!started){ started=true; if(onStart) onStart(); } };
+  u.onend = ()=>{ if(onEnd) onEnd(); };
+  u.onerror = ()=>{ if(onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+function vibe(ms){
+  if(state.vib==='关闭') return;
+  try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){}
+}
+
+/* ===== Toast ===== */
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+/* ===== 数字滚动动画 ===== */
+function animateNums(root){
+  if(!root) return;
+  root.querySelectorAll('[data-count]').forEach(el=>{
+    const m=el.dataset.count.match(/^([\d.]+)(.*)$/);
+    if(!m) return;
+    const target=parseFloat(m[1]), suffix=m[2]||'';
+    const dec=m[1].indexOf('.')>-1?1:0;
+    const t0=performance.now(), dur=900;
+    (function tick(t){
+      const p=Math.min(1,(t-t0)/dur);
+      const e=1-Math.pow(1-p,3);
+      el.textContent=(target*e).toFixed(dec)+suffix;
+      if(p<1) requestAnimationFrame(tick);
+    })(t0);
+  });
+}
+
+/* ===== 路由 ===== */
+const TAB_MAP={home:'home','nav-select':'nav-select','nav-route':'nav-select','nav-live':'nav-select',sense:'sense',indoor:'home',guardian:'guardian',sos:'home',cobuild:'home',settings:'profile',profile:'profile'};
+function clearNavTimers(){ navTimers.forEach(t=>clearTimeout(t)); navTimers=[]; }
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('screen-'+id);
+  if(el){
+    el.classList.add('active'); el.scrollTop=0; animateNums(el);
+    // 首页滚动容器是 .home-content，单独归零
+    if(id==='home'){ const hc=el.querySelector('.home-content'); if(hc) hc.scrollTop=0; }
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===TAB_MAP[id]));
+  if(id!=='nav-live'){ clearNavTimers(); clearNavVoice(); paused=false; const pb=document.getElementById('pause-btn'); if(pb) pb.textContent='暂停'; pauseAllDemoVideos(); stopDetTrack(); }
+  if(id==='sense'||id==='nav-live') camTry();
+  if(id==='home') fitMap();
+}
+
+/* ===== 首页真实地图（Leaflet + 高德瓦片，固定背景） ===== */
+var realMap=null;
+function mountRealMap(){
+  const bg=document.querySelector('#screen-home .map-bg');
+  if(!bg) return;
+  if(!bg.querySelector('#real-map')){
+    const d=document.createElement('div'); d.id='real-map'; bg.appendChild(d);
+  }
+  initRealMap();
+}
+function initRealMap(){
+  if(realMap || typeof L==='undefined') return;
+  const el=document.getElementById('real-map'); if(!el) return;
+  // 深圳大运中心（GCJ-02）
+  realMap=L.map(el,{
+    center:[22.6959,114.2260], zoom:16, minZoom:12, maxZoom:18,
+    dragging:false, scrollWheelZoom:false, touchZoom:false, doubleClickZoom:false,
+    boxZoom:false, keyboard:false, zoomControl:false, attributionControl:false
+  });
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}',{
+    subdomains:['1','2','3','4'], maxZoom:18, minZoom:12,
+    attribution:'© 高德地图'
+  }).addTo(realMap);
+  // 当前位置标记
+  const ic=L.divIcon({className:'',html:'<svg viewBox="0 0 30 44" width="30" height="44" style="filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))"><path d="M15 1C7.3 1 1 7.3 1 15c0 10.4 14 28 14 28s14-17.6 14-28C29 7.3 22.7 1 15 1z" fill="#2B6EF0" stroke="#fff" stroke-width="2.5"/><circle cx="15" cy="15" r="5" fill="#fff"/></svg>',iconSize:[30,44],iconAnchor:[15,42]});
+  L.marker([22.6959,114.2260],{icon:ic}).addTo(realMap);
+  try{ realMap.invalidateSize(); }catch(e){}
+}
+function fitMap(){
+  if(realMap) setTimeout(function(){ try{ realMap.invalidateSize(); }catch(e){} },80);
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',function(){ mountRealMap(); setTimeout(fitMap,800); });
+}else{ mountRealMap(); setTimeout(fitMap,800); }
+/* 页面加载后立即预热导航语音缓存，保证点「开始导航」时零延迟播报 */
+setTimeout(prewarmNavVoices, 1200);
+
+/* ===== 检测框轨迹跟随：让 AI 标注框随视频画面中障碍物的移动而移动 ===== */
+const DET_TRACKS = {
+  'det-step1': [ // 视频1 · 走向楼梯：楼梯始终在画面左侧，前0~2s不可见，随后从左中远景逐渐放大到左下近景（整体稍微上移）
+    {t:0.0,  left:0,  top:0,  w:0,  h:0},       // 远处看不见楼梯
+    {t:2.0,  left:30, top:44, w:18, h:14},      // 楼梯刚出现在左侧远处（稍微上移）
+    {t:4.0,  left:26, top:40, w:26, h:18},      // 楼梯靠近（稍微上移）
+    {t:6.0,  left:22, top:36, w:34, h:24},      // 楼梯更大（稍微上移）
+    {t:8.0,  left:16, top:32, w:46, h:30},      // 楼梯占据画面左侧（稍微上移）
+    {t:10.7, left:8,  top:28, w:60, h:38}       // 楼梯非常近，占据左半画面（稍微上移）
+  ],
+  'det-step2': [ // 视频2 · 上楼梯：楼梯正面始终在画面中央偏右，从远景到近景再到占满下半部分；7s后到顶，8-9s看到右侧楼梯远景，10s后转v3场景
+    {t:0.0,  left:15, top:32, w:55, h:38},      // 楼梯远景，中央偏右
+    {t:2.0,  left:18, top:38, w:58, h:42},      // 楼梯靠近
+    {t:4.0,  left:20, top:44, w:62, h:46},      // 楼梯更大
+    {t:6.0,  left:22, top:50, w:66, h:48},      // 楼梯占满下半部分（准备爬）
+    {t:7.0,  left:10, top:62, w:80, h:36},      // 爬梯中，台阶在脚下
+    {t:8.0,  left:48, top:20, w:45, h:40},      // 已到顶部，楼梯在画面右侧
+    {t:9.0,  left:55, top:15, w:40, h:35},      // 楼梯在远处右侧
+    {t:10.0, left:0,  top:0,  w:0,  h:0},       // 视频转场到v3场景，楼梯消失
+    {t:13.0, left:0,  top:0,  w:0,  h:0}        // 保持隐藏
+  ],
+  'det-lamp': [ // 视频3 · 右转后直行：左侧灯杆，从前方→近处→身边→身后远处（整体再往右偏一点）
+    {t:0.0,  left:42, top:4,  w:18, h:60},      // 灯杆在前方左侧偏右（再往右偏 10%）
+    {t:2.0,  left:22, top:2,  w:22, h:92},      // 灯杆非常近，左半画面（再往右偏 6%）
+    {t:4.0,  left:16, top:2,  w:18, h:92},      // 灯杆从身边过，左侧留 16% 边距（再往右偏 4%）
+    {t:5.5,  left:14, top:8,  w:13, h:80},      // 灯杆刚刚从身边过，开始后退（再往右偏 4%）
+    {t:7.0,  left:30, top:22, w:14, h:48},      // 灯杆已过身后，远处偏右（再往右偏 4%）
+    {t:8.3,  left:38, top:28, w:12, h:38}       // 灯杆更远更小（再往右偏 4%）
+  ]
+};
+function lerpTrack(keys, t){
+  if(t<=keys[0].t) return keys[0];
+  for(let i=0;i<keys.length-1;i++){
+    const a=keys[i], b=keys[i+1];
+    if(t<=b.t){
+      const k=(b.t===a.t)?1:(t-a.t)/(b.t-a.t);
+      const kk=k*k*(3-2*k); // smoothstep 平滑
+      return {left:a.left+(b.left-a.left)*kk, top:a.top+(b.top-a.top)*kk,
+              w:a.w+(b.w-a.w)*kk, h:a.h+(b.h-a.h)*kk};
+    }
+  }
+  return keys[keys.length-1];
+}
+let detTrackRAF=null;
+function detTrackTick(){
+  const live=document.getElementById('screen-nav-live');
+  if(!live || !live.classList.contains('active')){ detTrackRAF=null; return; }
+  const active=document.querySelector('.demo-video.active');
+  if(active){
+    const t=active.currentTime||0;
+    for(const [id,keys] of Object.entries(DET_TRACKS)){
+      const el=document.getElementById(id);
+      if(!el || !el.classList.contains('show')) continue;
+      const p=lerpTrack(keys,t);
+      el.style.left=p.left+'%'; el.style.top=p.top+'%';
+      el.style.width=p.w+'%';   el.style.height=p.h+'%';
+    }
+  }
+  detTrackRAF=requestAnimationFrame(detTrackTick);
+}
+function startDetTrack(){
+  if(detTrackRAF) cancelAnimationFrame(detTrackRAF);
+  detTrackRAF=requestAnimationFrame(detTrackTick);
+}
+function stopDetTrack(){
+  if(detTrackRAF){ cancelAnimationFrame(detTrackRAF); detTrackRAF=null; }
+}
+
+/* ===== 缩放适配 ===== */
+function fit(){
+  const ph=document.getElementById('phone');
+  const s=Math.min((innerHeight-24)/844,(innerWidth-16)/390,1);
+  ph.style.transform='scale('+s+')';
+}
+addEventListener('resize',fit);
+
+/* ===== 启动页 ===== */
+window.addEventListener('load',()=>{
+  fit();
+  setTimeout(()=>{ try{ speak('欢迎使用SoundLane，您的出行领航助手。正在为您加载无障碍模式。'); }catch(e){} },900);
+  setTimeout(()=>{ const sp=document.getElementById('screen-splash'); if(sp && sp.classList.contains('active')) go('home'); },3600);
+});
+
+/* ===== 首页语音唤醒 ===== */
+const collapseBtn=document.getElementById('collapse-btn');
+collapseBtn.addEventListener('click',()=>{
+  const h=document.getElementById('screen-home');
+  const collapsed=h.classList.toggle('collapsed');
+  collapseBtn.title=collapsed?'展开出行板块':'收起板块，查看地图';
+  speak(collapsed?'已收起出行板块，为您展示周边地图':'已展开出行板块，正在为您播报今日出行数据');
+  if(!collapsed) animateNums(h);
+});
+/* ===== 灵动岛通知 + 设备连接 ===== */
+let islandT=null;
+// 真实灵动岛：AirPods 图标外环绕绿色电量环
+const AIRPODS_ICON='<svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="10.4" fill="none" stroke="#30d158" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="58 65" transform="rotate(-90 14 14)" opacity=".95"/><path d="M10.8 6.6c-2.7 0-4 1.8-4 4v9.9a1.3 1.3 0 0 0 2.6 0V16c.5.2 1.3.3 1.9.3 2.7 0 4-1.8 4-4s-1.3-3.7-4-3.7z"/><path d="M17.2 6.6c2.7 0 4 1.8 4 4v9.9a1.3 1.3 0 0 1-2.6 0V16c-.5.2-1.3.3-1.9.3-2.7 0-4-1.8-4-4s1.3-3.7 4-3.7z"/></svg>';
+const WATCH_ICON='<svg viewBox="0 0 24 24"><rect x="6.5" y="4.5" width="11" height="15" rx="3.2"/><path d="M9 4.5 9.7 2h4.6l.7 2.5M9 19.5l.7 2.5h4.6l.7-2.5"/></svg>';
+function deviceIcon(name){ return /watch/i.test(name)?WATCH_ICON:AIRPODS_ICON; }
+function island(title,sub,icon){
+  const el=document.getElementById('dynamic-island');
+  el.querySelector('#di-ic1').innerHTML=icon||AIRPODS_ICON;
+  el.querySelector('#di-ic2').innerHTML='';
+  el.querySelector('.di-t1').textContent=title;
+  el.querySelector('.di-t2').textContent=sub||'';
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(islandT);
+  islandT=setTimeout(()=>el.classList.remove('show'),2800);
+}
+function connectDevice(row,name,sub){
+  const tag=row.querySelector('.tag');
+  if(tag){ tag.textContent='已连接'; tag.style.background='rgba(52,199,89,.12)'; tag.style.color='#28a745'; }
+  island(name+' 已连接',sub,deviceIcon(name));
+  vibe(120);
+  setTimeout(()=>speak(name+'已连接，'+sub),600);
+}
+const vmic=document.getElementById('vmic');
+const tip=document.getElementById('listen-tip');
+vmic.addEventListener('click',()=>{
+  if(vmic.classList.contains('listening')) return;
+  vmic.classList.add('listening');
+  tip.textContent='正在聆听…';
+  setTimeout(()=>{
+    vmic.classList.remove('listening');
+    tip.textContent='好的，已为您规划前往 大运中心体育馆 的路线';
+    dest='大运中心体育馆';
+    const inp=document.getElementById('dest-input'); if(inp) inp.value='大运中心体育馆';
+    pickDest(document.querySelector('.dest-item[data-dest="大运中心体育馆"]'));
+    go('nav-select');
+    speak('好的，正在为您规划前往大运中心体育馆的路线。');
+  },1600);
+});
+
+/* ===== 出行：目的地 ===== */
+function pickDest(el){
+  document.querySelectorAll('.dest-item').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  dest=el.dataset.dest;
+  document.getElementById('dest-input').value=dest;
+  speak('已选择目的地：'+dest);
+}
+function setPref(el){
+  document.querySelectorAll('#pref-seg button').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('route-pref-chip').textContent=el.textContent;
+}
+function voiceDest(){
+  speak('请说出目的地，例如：去大运中心体育馆');
+  toast('语音识别演示：识别到「大运中心体育馆」');
+  setTimeout(()=>pickDest(document.querySelector('.dest-item[data-dest="大运中心体育馆"]')),1500);
+}
+function planRoute(){
+  const v=document.getElementById('dest-input').value.trim();
+  if(v) dest=v;
+  document.getElementById('route-dest-title').textContent='到 '+dest;
+  go('nav-route');
+  speak('已为您规划前往'+dest+'的盲道友好路线，全程 1.0 公里，预计 15 分钟。');
+}
+
+/* ===== 实时导航：实拍三段视频演示 ===== */
+function pauseAllDemoVideos(){
+  document.querySelectorAll('.demo-video').forEach(v=>{ try{v.pause();}catch(e){} });
+}
+function resetAllDemoVideos(){
+  pauseAllDemoVideos();
+  document.querySelectorAll('.demo-video').forEach(v=>{ try{v.currentTime=0;}catch(e){} });
+  ['det-step1','det-step2','det-lamp'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.classList.remove('show','prox-far','prox-mid','prox-near');
+      el.style.setProperty('--prox','0.5');
+    }
+  });
+  const v=document.getElementById('vibe-icon'); if(v) v.classList.remove('show');
+  const s=document.getElementById('demo-stage'); if(s) s.classList.remove('show');
+}
+function startNav(){
+  go('nav-live');
+  navStep=0; paused=false;
+  document.getElementById('live-dest').textContent='到 '+dest;
+  setLive('30 米','直行','沿大路走向楼梯',1);
+  document.getElementById('obstacle-alert').classList.remove('show');
+  document.getElementById('busbar').classList.remove('show');
+  document.getElementById('arrive-card').classList.remove('show');
+  document.getElementById('big-arrow').querySelector('svg').style.transform='rotate(0deg)';
+  spatialDir('mid');
+
+  // 演示元素重置 + 阶段提示
+  resetAllDemoVideos();
+  const stage=document.getElementById('demo-stage');
+  stage.textContent='阶段 1/3 · 走向楼梯';
+  stage.classList.add('show');
+
+  const v1=document.getElementById('demo-v1');
+  const v2=document.getElementById('demo-v2');
+  const v3=document.getElementById('demo-v3');
+  /* 视频播放速率（再次降速）：保证每段语音能完整念完而不被下一句打断
+     v1=10.73s(4段播报约15s)→0.6x=16.5s, v2=13.07s(3段约12s)→0.78x=16.7s, v3=8.33s(3段约9.5s)→0.72x=11.6s */
+  try{ v1.playbackRate = 0.6; v2.playbackRate = 0.78; v3.playbackRate = 0.72; }catch(e){}
+  v1.classList.add('active'); v2.classList.remove('active'); v3.classList.remove('active');
+
+  clearNavTimers();
+  clearNavVoice();
+  speakNav('导航开始，直行三十米，前方有楼梯，注意听提示。');
+  startDetTrack(); // 启动检测框轨迹跟随（随视频画面移动）
+
+  // ===== 视频1 (≈10.7s @0.78x = 13.76s 有效时长) 走向楼梯 =====
+  // 定时器按有效视频时间反推：3500/0.78≈4487, 7000/0.78≈8974, 10500/0.78≈13461
+  navTimers.push(setTimeout(()=>{ v1.play().catch(e=>console.warn('v1.play',e)); },350));
+
+  navTimers.push(setTimeout(()=>{
+    navStep=1;
+    setLive('20 米','直行','前方 20 米有楼梯',2);
+    document.getElementById('det-step1').classList.add('show');
+    speakNav('前方二十米检测到楼梯，请准备左转。');
+  },4500));
+
+  // 删除了原 9.0s「10 米」播报，避免与 11.5s 的 10 米重复且过早打断 20 米
+
+  navTimers.push(setTimeout(()=>{
+    setLive('10 米','左转','距楼梯 10 米，请继续左转',6.5);
+    speakNav('距楼梯十米，请继续左转靠拢。');
+  },14500));
+
+  // 视频1 结束 → 视频2
+  const onV1End=function(){
+    document.getElementById('det-step1').classList.remove('show');
+    stage.textContent='阶段 2/3 · 爬楼梯';
+    v1.classList.remove('active');
+    v2.classList.add('active');
+    try{ v2.currentTime=0; }catch(e){}
+    navStep=3;
+    setLive('3 米','上楼梯','前方 3 米有楼梯 · 共 5 节',7.5);
+    // 震动 + 语音
+    document.getElementById('vibe-icon').classList.add('show');
+    vibe(state.vib==='强'?400:200);
+    speakNav('警告！前方三米有楼梯，共5节，每节高十厘米，请放缓脚步。');
+
+    navTimers.push(setTimeout(()=>{
+      document.getElementById('vibe-icon').classList.remove('show');
+      document.getElementById('det-step2').classList.add('show');
+      setLive('爬梯中','上楼梯','正在爬楼梯，请稳步上行',8.2);
+    },2500));
+
+    navTimers.push(setTimeout(()=>{
+      setLive('已到顶','上楼梯','即将到达楼梯顶部',9.5);
+      speakNav('即将到达楼梯顶部，请准备右转。');
+    },12000));
+
+    // 视频2 结束 → 视频3
+    const onV2End=function(){
+      document.getElementById('det-step2').classList.remove('show');
+      stage.textContent='阶段 3/3 · 右转后';
+      v2.classList.remove('active');
+      v3.classList.add('active');
+      try{ v3.currentTime=0; }catch(e){}
+      navStep=4;
+      setLive('20 米','右转','右转后直行，注意左侧灯杆',7.8);
+      const detLamp=document.getElementById('det-lamp');
+      detLamp.classList.add('show','prox-far');
+      detLamp.style.setProperty('--prox','0.3');
+      speakNav('右转完成，沿人行道直行。');
+
+      navTimers.push(setTimeout(()=>{
+        setLive('10 米','直行','左侧 2 米有灯杆，注意闪避',8.6);
+        vibe(150);
+        // 触发空间音频左侧放大：灯杆在画面左侧，模拟"左耳听到警示"的方位感
+        spatialDir('l');
+        speakNav('注意！左侧两米有灯杆，请向右侧稍偏闪避。');
+      },2800));
+
+      navTimers.push(setTimeout(()=>{
+        setLive('5 米','直行','继续直行，灯杆已过',9.3);
+        // 灯杆已过，空间音频回归中央
+        spatialDir('mid');
+        speakNav('灯杆已过，继续直行。');
+      },6000));
+
+      // 视频3 结束 → 到达
+      const onV3End=function(){
+        stage.classList.remove('show');
+        document.getElementById('det-lamp').classList.remove('show');
+        navStep=5;
+        setLive('到达','','已到达 · 大运中心体育馆',10);
+        document.getElementById('arrive-card').classList.add('show');
+        speakNav('您已到达大运中心体育馆，无障碍入口在右侧八米。本次导航结束。');
+      };
+      v3.addEventListener('ended', onV3End, {once:true});
+      v3.play().catch(e=>console.warn('v3.play',e));
+    };
+    v2.addEventListener('ended', onV2End, {once:true});
+    v2.play().catch(e=>console.warn('v2.play',e));
+  };
+  v1.addEventListener('ended', onV1End, {once:true});
+}
+function setLive(distTxt,dirTxt,nextTxt,pct){
+  document.getElementById('live-dist').innerHTML=distTxt+'<small> 米</small>';
+  const d=document.getElementById('live-next');
+  if(dirTxt){ d.innerHTML='<b>'+dirTxt+'</b> '+nextTxt; } else { d.textContent=nextTxt; }
+  document.getElementById('live-progress').style.width=pct+'%';
+  // 同步刷新 det-step1 距离标签：让画面上的"台阶 · X m"始终与语音播报的距离一致
+  const lbl1=document.querySelector('#det-step1 .det-label');
+  if(lbl1){
+    const m = String(distTxt).match(/(\d+(?:\.\d+)?)/);
+    if(m){
+      const dist = parseFloat(m[1]);
+      lbl1.textContent = '台阶 · ' + m[1] + ' m';
+      // 距离分级：远(>15m) 黄 / 中(5-15m) 橙 / 近(<5m) 红
+      const det1 = document.getElementById('det-step1');
+      det1.classList.remove('prox-far','prox-mid','prox-near');
+      if(dist > 15) det1.classList.add('prox-far');
+      else if(dist > 5) det1.classList.add('prox-mid');
+      else det1.classList.add('prox-near');
+      // CSS 变量驱动 transform 缩放
+      det1.style.setProperty('--prox', dist>15?'0.3':(dist>5?'0.6':'1'));
+    }
+  }
+  // 同步刷新 det-lamp 距离标签 + 距离分级
+  const lblL=document.querySelector('#det-lamp .det-label');
+  if(lblL){
+    const m2 = String(nextTxt||'').match(/(\d+(?:\.\d+)?)\s*米/);
+    if(m2){
+      const lampDist = parseFloat(m2[1]);
+      lblL.textContent = '灯杆 · 左侧 ' + m2[1] + ' m';
+      const detL = document.getElementById('det-lamp');
+      detL.classList.remove('prox-far','prox-mid','prox-near');
+      if(lampDist > 5) detL.classList.add('prox-far');
+      else if(lampDist > 2) detL.classList.add('prox-mid');
+      else detL.classList.add('prox-near');
+      detL.style.setProperty('--prox', lampDist>5?'0.3':(lampDist>2?'0.6':'1'));
+    }
+  }
+}
+function spatialDir(dir){
+  const mid=document.getElementById('spatial-mid');
+  const bars=[...mid.children];
+  // 给每个条形设置 --i 序号，用于 staggered 脉冲动画延迟，形成声波从左到右的传播感
+  bars.forEach((d,i)=>d.style.setProperty('--i', i));
+  // 移动光晕位置（左侧=18% / 居中=50% / 右侧=82%）
+  const wrap = mid.closest('.spatial');
+  if(wrap){
+    wrap.style.setProperty('--wave-x', dir==='l'?'15%':(dir==='r'?'85%':'50%'));
+    // 方向触发：左/右障碍时整侧条形变高变亮（覆盖脉冲动画）
+    wrap.classList.remove('dir-l','dir-r');
+    if(dir==='l') wrap.classList.add('dir-l');
+    else if(dir==='r') wrap.classList.add('dir-r');
+    // 3.5s 后清除方向类，恢复脉冲
+    setTimeout(()=>{ if(wrap) wrap.classList.remove('dir-l','dir-r'); },3500);
+  }
+  const earId=dir==='l'?'ear-l':(dir==='r'?'ear-r':null);
+  const ear=earId?document.getElementById(earId):null;
+  if(ear) ear.classList.add('on');
+  setTimeout(()=>{ if(ear) ear.classList.remove('on'); },1800);
+  // 仅保留 ear 高亮 + dir-l/dir-r 类 + 光晕移动；不再用 .hl 类高亮单点（避免视觉冲突）
+  bars.forEach(d=>d.classList.remove('hl'));
+}
+function repeatStep(){
+  const msgs=[
+    '导航开始，沿当前道路直行 30 米，前方将出现楼梯',
+    '前方 20 米检测到楼梯，请准备左转进入',
+    '距楼梯 10 米，请继续左转靠拢，注意脚下',
+    '警告！前方 3 米有楼梯，共 5 节，每节高 10 厘米',
+    '注意！左侧 2 米有灯杆，请向右侧稍偏，注意闪避',
+    '已到达大运中心体育馆附近'
+  ];
+  const i=Math.min(navStep,msgs.length-1);
+  speak(msgs[i]);
+}
+function togglePause(){
+  paused=!paused;
+  document.getElementById('pause-btn').textContent=paused?'继续':'暂停';
+  if(paused){
+    clearNavVoice();
+    pauseAllDemoVideos();
+    toast('播报已暂停');
+  } else {
+    document.querySelectorAll('.demo-video.active').forEach(v=>v.play().catch(()=>{}));
+    speakNav('已恢复导航播报');
+  }
+}
+function stopNav(){
+  clearNavTimers();
+  clearNavVoice();
+  resetAllDemoVideos();
+  stopDetTrack();
+  go('home');
+  toast('导航已结束');
+}
+document.getElementById('obstacle-alert').addEventListener('click',function(){ this.classList.remove('show'); document.getElementById('pause-btn').textContent='暂停'; });
+
+/* ===== 避障感知 + 真实 AI 检测引擎（TensorFlow.js + COCO-SSD，本地推理） ===== */
+let detModel=null, detStatus='idle', detTimer=null, lastAnn=0;
+const CLASS_ZH={person:'行人',bicycle:'自行车',car:'汽车',motorcycle:'摩托车',bus:'公交车',truck:'货车',chair:'椅子',bench:'长凳',bottle:'水瓶',cup:'杯子',backpack:'背包',umbrella:'雨伞',pottedplant:'盆栽',trafficlight:'红绿灯',stopsign:'停车标志',handbag:'手提包',suitcase:'行李箱',skateboard:'滑板',dog:'犬只',cat:'猫',kite:'风筝',sportsball:'球类',tie:'领带',clock:'钟表'};
+function zhName(c){
+  const k=c.toLowerCase().replace(/\s/g,'');
+  return CLASS_ZH[k]||CLASS_ZH[c.toLowerCase()]||c;
+}
+function riskOf(c){
+  const k=c.toLowerCase();
+  if(['car','bus','truck','motorcycle','traffic light','stop sign'].indexOf(k)>-1) return 'high';
+  if(['person','bicycle','skateboard','dog'].indexOf(k)>-1) return 'mid';
+  return 'low';
+}
+function estDist(box,vidH){
+  const ratio=box[3]/Math.max(vidH,1);
+  const d=1.7/ratio;
+  return Math.max(0.5,Math.min(12,d));
+}
+function setCamChips(st){
+  document.querySelectorAll('.cc-ai').forEach(el=>{
+    el.textContent=st==='就绪'?'AI 感知 · 就绪':(st==='加载中'?'AI 模型加载中…':'演示模式');
+    el.classList.toggle('ok',st==='就绪');
+  });
+}
+function loadDetector(){
+  if(detStatus!=='idle') return Promise.resolve(detStatus==='ready');
+  detStatus='loading';
+  setCamChips('加载中');
+  return new Promise(res=>{
+    try{
+      if(!window.cocoSsd||!window.tf){ throw new Error('lib missing'); }
+      cocoSsd.load({modelUrl:'assets/ssdlite/model.json'}).then(m=>{
+        detModel=m; detStatus='ready'; setCamChips('就绪'); res(true);
+      }).catch(e=>{ detStatus='failed'; console.warn('AI 模型加载失败',e); setCamChips('演示'); res(false); });
+    }catch(e){ detStatus='failed'; console.warn('AI 引擎不可用',e); setCamChips('演示'); res(false); }
+  });
+}
+function activeCam(){
+  const s=document.querySelector('.screen.active');
+  if(!s) return null;
+  if(s.id==='screen-sense') return {vid:document.getElementById('cam-video'),cv:document.getElementById('sense-canvas')};
+  if(s.id==='screen-nav-live') return {vid:document.getElementById('nav-video'),cv:document.getElementById('nav-canvas')};
+  return null;
+}
+async function detectTick(){
+  const a=activeCam();
+  if(!a||!a.vid||a.vid.readyState<2){ detTimer=setTimeout(detectTick,500); return; }
+  let preds=[];
+  if(detModel){ try{ preds=await detModel.detect(a.vid); }catch(e){} }
+  const W=a.vid.videoWidth||640, H=a.vid.videoHeight||480;
+  a.cv.width=W; a.cv.height=H;
+  const ctx=a.cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  let priority=null;
+  for(const p of preds){
+    if(p.score<0.45) continue;
+    const [x,y,w,h]=p.bbox;
+    const d=estDist(p.bbox,H);
+    const risk=riskOf(p.className);
+    const col=risk==='high'?'#e11d48':(risk==='mid'?'#f59e0b':'#10b981');
+    ctx.strokeStyle=col; ctx.lineWidth=Math.max(2,W/320);
+    ctx.strokeRect(x,y,w,h);
+    const label=zhName(p.className)+' · '+(Math.round(d*10)/10)+'m';
+    ctx.font='bold '+Math.max(12,Math.round(13+W/64))+'px system-ui,-apple-system,sans-serif';
+    const tw=ctx.measureText(label).width;
+    ctx.fillStyle=col; ctx.fillRect(x,Math.max(0,y-24),tw+12,24);
+    ctx.fillStyle='#fff'; ctx.fillText(label,x+6,Math.max(15,y-7));
+    const rank=risk==='high'?0:(risk==='mid'?1:2);
+    if(!priority||rank<priority.rank||(rank===priority.rank&&d<priority.d)) priority={name:zhName(p.className),d,risk,rank};
+  }
+  const now=Date.now();
+  if(priority&&now-lastAnn>4000){
+    lastAnn=now;
+    const dTxt=priority.d>=10?'约十米外':('约 '+(Math.round(priority.d*10)/10)+' 米');
+    if(priority.risk==='high'){ speak('警告！前方'+dTxt+'有'+priority.name+'，请停下脚步，注意避让。'); vibe(250); }
+    else speak('前方'+dTxt+'有'+priority.name+'，请留意。');
+  }
+  detTimer=setTimeout(detectTick,450);
+}
+function camTry(){
+  if(camStream) return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}})
+    .then(stream=>{
+      camStream=stream;
+      const v1=document.getElementById('cam-video'), v2=document.getElementById('nav-video');
+      if(v1){v1.srcObject=stream; v1.style.display='block';}
+      if(v2){v2.srcObject=stream; v2.style.display='block';}
+      const sc=document.getElementById('cam-scene'); if(sc) sc.style.display='none';
+      document.querySelectorAll('#screen-sense .dbox').forEach(b=>b.style.display='none');
+      camMode='real';
+      loadDetector().then(()=>{ if(!detTimer) detTimer=setTimeout(detectTick,600); });
+    })
+    .catch(()=>{ camMode='sim'; setCamChips('演示'); });
+}
+function switchCamMode(){
+  const cv=document.getElementById('sense-canvas');
+  if(camMode==='real'){
+    camMode='sim';
+    document.getElementById('cam-video').style.display='none';
+    const sc=document.getElementById('cam-scene'); if(sc) sc.style.display='block';
+    document.querySelectorAll('#screen-sense .dbox').forEach(b=>b.style.display='');
+    if(cv) cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+  }else{
+    camMode='real';
+    camTry();
+  }
+}
+function senseSpeak(){
+  if(detStatus==='ready'&&camStream){ speak('AI 实时感知已开启。检测到障碍物或行人时，将自动语音提醒。所有识别在本地完成，数据不上传。'); }
+  else speak('当前识别到 4 个目标：前方 1.2 米台阶，高风险；前方 0.8 米水坑，中风险；左侧 2.5 米行人；上方 1.5 米悬空障碍。请小心通行。');
+  vibe(150);
+}
+
+/* ===== 室内导航 ===== */
+const POI_ROUTES={
+  '290,40':'170,340 290,340 290,58',
+  '14,40':'170,340 32,340 32,58',
+  '290,310':'170,340 308,340 308,328',
+  '130,210':'170,340 170,235'
+};
+const POI_TEXT={
+  '290,40':['无障碍电梯','向前直行 15 米，在您的左侧到达无障碍电梯。'],
+  '14,40':['商场出口','向前直行 15 米后右转，到达商场出口。'],
+  '290,310':['无障碍卫生间','沿走廊向前直行，在右侧 12 米处到达无障碍卫生间。'],
+  '130,210':['服务台','直行 8 米，到达商场中央服务台，可寻求工作人员协助。']
+};
+document.querySelectorAll('#screen-indoor rect').forEach(r=>{
+  const key=r.getAttribute('x')+','+r.getAttribute('y');
+  if(POI_ROUTES[key]){
+    r.style.cursor='pointer';
+    r.addEventListener('click',()=>{
+      const line=document.getElementById('route-line');
+      line.setAttribute('points',POI_ROUTES[key]);
+      line.style.display='block';
+      const arr=POI_TEXT[key];
+      document.getElementById('indoor-tip').textContent='正在领航：前往 '+arr[0];
+      speak(arr[1]);
+      vibe(100);
+    });
+  }
+});
+function setFloor(el,f){
+  document.querySelectorAll('.floors .f').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('indoor-tip').textContent='已切换至 '+f+'，当前定位更新中…';
+  speak('已切换至'+f.replace(' 层','')+'层');
+}
+
+/* ===== 守护 ===== */
+function remoteHelp(){
+  toast('已向 妈妈 · 张慧 发起远程协助请求');
+  speak('已向妈妈发起远程协助请求，她可以看到您的实时路线。');
+}
+
+/* ===== 求助 ===== */
+function sosGo(){
+  const btn=document.getElementById('sos-btn');
+  const lab=document.getElementById('sos-label');
+  if(btn.classList.contains('counting')) return;
+  btn.classList.add('counting');
+  let n=3;
+  lab.textContent=n;
+  speak('即将发送求助，3');
+  const iv=setInterval(()=>{
+    n--;
+    if(n>0){ lab.textContent=n; speak(n); }
+    else{
+      clearInterval(iv);
+      btn.classList.remove('counting');
+      lab.textContent='求助已发出';
+      document.getElementById('sos-ok').classList.add('show');
+      speak('求助已发出。已通知您的家人与志愿者，位置信息已发送。请保持手机畅通。');
+      vibe([300,200,300]);
+    }
+  },900);
+}
+
+/* ===== 共建 ===== */
+let coType='盲道损坏';
+let coCount=328;
+function setCoType(el,t){
+  document.querySelectorAll('#cotype button').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  coType=t;
+}
+function submitCo(){
+  const loc=document.getElementById('co-loc').value.trim()||'大运中心体育馆南门附近';
+  coCount++;
+  document.querySelector('#screen-cobuild .nav .chip').textContent=coCount+' 条标注';
+  const box=document.querySelector('#screen-cobuild .mapmini');
+  const mk=document.createElement('div');
+  mk.className='mk';
+  mk.style.left=(12+Math.random()*76)+'%';
+  mk.style.top=(15+Math.random()*65)+'%';
+  mk.title=coType+' · '+loc;
+  mk.innerHTML='<svg viewBox="0 0 24 24" fill="#0a6cff"><path d="M12 2l3 6 6 .9-4.5 4.3 1.1 6.3L12 16.5 6.4 19.5l1.1-6.3L3 8.9 9 8l3-6z"/></svg><span>'+coType+'</span>';
+  box.appendChild(mk);
+  toast('标注已提交，感谢您的贡献');
+  speak('标注已提交，类型：'+coType+'，位置：'+loc+'。感谢您为出行者点亮道路。');
+  document.getElementById('co-loc').value='';
+}
+
+/* ===== 设置 ===== */
+function setFreq(el,f){
+  document.querySelectorAll('#freq-seg button').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  state.freq=f;
+  const desc={'频繁':'频繁：每个路口与障碍都详细播报','标准':'标准：关键转向 + 障碍提示，避免信息过载','精简':'精简：仅播报转向与紧急危险'};
+  document.getElementById('freq-desc').textContent=desc[f];
+}
+function toggleSpatial(el){
+  el.classList.toggle('on');
+  state.spatial=el.classList.contains('on');
+  toast(state.spatial?'空间音频领航已开启':'空间音频领航已关闭');
+}
+function setVib(el,v){
+  document.querySelectorAll('#vib-seg button').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  state.vib=v;
+}
+</script>
+</body>
+</html>

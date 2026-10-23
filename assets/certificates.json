@@ -1,0 +1,83 @@
+[
+  {
+    "id": "mati-national-silver",
+    "title": "2026年第八届码蹄杯程序设计大赛",
+    "award": "职业院校赛道国赛银奖",
+    "category": "competition",
+    "image": "assets/certificates/mati-national-silver.jpg",
+    "width": 904,
+    "height": 1280
+  },
+  {
+    "id": "mati-regional-gold",
+    "title": "2026年第八届码蹄杯程序设计大赛",
+    "award": "职业院校赛道华南及港澳台赛区省赛金奖",
+    "category": "competition",
+    "image": "assets/certificates/mati-regional-gold.jpg",
+    "width": 904,
+    "height": 1280
+  },
+  {
+    "id": "outsourcing-national-third",
+    "title": "第十七届中国大学生服务外包创新创业大赛",
+    "award": "全国赛企业命题类三等奖",
+    "category": "competition",
+    "image": "assets/certificates/outsourcing-national-third.jpg",
+    "width": 1600,
+    "height": 1131
+  },
+  {
+    "id": "challenge-cup-bronze",
+    "title": "第十五届“挑战杯”广东大学生创业计划竞赛",
+    "award": "铜奖",
+    "category": "competition",
+    "image": "assets/certificates/challenge-cup-bronze.jpg",
+    "width": 1600,
+    "height": 1103
+  },
+  {
+    "id": "soundlane-mobile-first",
+    "title": "2026中国高校计算机大赛移动应用创新赛",
+    "award": "启明赛道（高教组）华南赛区一等奖",
+    "category": "competition",
+    "image": "assets/certificates/soundlane-mobile-first.jpg",
+    "width": 1131,
+    "height": 1600
+  },
+  {
+    "id": "robot-vision-third",
+    "title": "2026年广东省大学生计算机设计大赛",
+    "award": "智能机器人视觉系统挑战赛三等奖",
+    "category": "competition",
+    "image": "assets/certificates/robot-vision-third.jpg",
+    "width": 1600,
+    "height": 1132
+  },
+  {
+    "id": "huawei-hcia-ai",
+    "title": "华为 HCIA-AI",
+    "award": "HCIA-AI 认证",
+    "category": "certification",
+    "image": "assets/certificates/huawei-hcia-ai.jpg",
+    "width": 1600,
+    "height": 1131
+  },
+  {
+    "id": "china-us-maker",
+    "title": "2026中美青年创客大赛",
+    "award": "深圳分赛区（职业院校赛道）选拔赛优秀奖",
+    "category": "competition",
+    "image": "assets/certificates/china-us-maker.jpg",
+    "width": 1109,
+    "height": 1600
+  },
+  {
+    "id": "lions-innovation",
+    "title": "“深圳狮子会杯”粤港澳大湾区职业院校创新创业校际邀请赛",
+    "award": "优秀奖",
+    "category": "competition",
+    "image": "assets/certificates/lions-innovation.jpg",
+    "width": 1126,
+    "height": 1600
+  }
+]
